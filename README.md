@@ -70,12 +70,18 @@
 GitHub Pages（リポジトリ kaminendo-osako/ryu-quest の main ブランチ）で公開中。
 `git push` すると1〜2分で本番に反映されます。`doc/` フォルダと旧版バックアップは `.gitignore` で除外済み。
 
-### 独自ドメイン（kaminendo.art/osako）
+### 独自ドメイン（osako.kaminendo.art）
 
-`cloudflare/osako-worker.js` を Cloudflare Worker として設置し、
-ルート `kaminendo.art/osako*` を割り当てると `https://kaminendo.art/osako/` で公開される。
-Worker は GitHub Pages を中継するだけなので、GitHub を更新すれば独自ドメイン側も自動で最新になる。
-（反映は GitHub Pages のキャッシュの都合で最大10分程度）
+kaminendo.art は WordPress.com 管理（NS: ns1-3.wordpress.com）のため、
+パス型（kaminendo.art/osako）は不可。サブドメイン型で対応する：
+
+1. WordPress.com の DNS 管理で CNAME を追加
+   - 名前: `osako` ／ 値: `kaminendo-osako.github.io`
+2. GitHub Pages のカスタムドメインに `osako.kaminendo.art` を設定（API: PUT /repos/.../pages cname）
+3. HTTPS 証明書の発行を待って Enforce HTTPS を有効化
+
+GitHub を更新すれば独自ドメイン側も自動で最新になる。
+※ `cloudflare/osako-worker.js` は、将来DNSをCloudflareに移管した場合にパス型で使える予備。
 
 ### デプロイが「Deployment failed, try again later」で連発したとき
 

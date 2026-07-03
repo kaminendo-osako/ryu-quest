@@ -1,0 +1,11 @@
+# kaminendo.art/osako 中継Worker のデプロイ設定
+# デプロイ: このフォルダで `wrangler deploy`
+name = "osako-proxy"
+main = "osako-worker.js"
+compatibility_date = "2026-07-01"
+workers_dev = false
+
+routes = [
+  { pattern = "kaminendo.art/osako*", zone_name = "kaminendo.art" },
+  { pattern = "www.kaminendo.art/osako*", zone_name = "kaminendo.art" }
+]
