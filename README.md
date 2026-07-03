@@ -47,7 +47,7 @@
 |---|---|
 | ryu_portrait.jpg | ドット絵ポートレートの元＋オープニング背景 |
 | ryu_magic.jpg | 「つよさ」画面の背景 |
-| osako_lineart.jpg / line_qr.png / ryu_stage.jpg / ryu_casual.jpg | 現在未使用（予備） |
+| osako_lineart.jpg / ryu_stage.jpg / ryu_casual.jpg | 現在未使用（予備） |
 
 ## 旧バージョン
 
