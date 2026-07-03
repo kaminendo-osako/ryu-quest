@@ -69,3 +69,14 @@
 
 GitHub Pages（リポジトリ kaminendo-osako/ryu-quest の main ブランチ）で公開中。
 `git push` すると1〜2分で本番に反映されます。`doc/` フォルダと旧版バックアップは `.gitignore` で除外済み。
+
+### 独自ドメイン（kaminendo.art/osako）
+
+`cloudflare/osako-worker.js` を Cloudflare Worker として設置し、
+ルート `kaminendo.art/osako*` を割り当てると `https://kaminendo.art/osako/` で公開される。
+Worker は GitHub Pages を中継するだけなので、GitHub を更新すれば独自ドメイン側も自動で最新になる。
+（反映は GitHub Pages のキャッシュの都合で最大10分程度）
+
+### デプロイが「Deployment failed, try again later」で連発したとき
+
+Pages のデプロイ詰まり。GitHub API で Pages を DELETE → POST（無効化→再有効化）すると直る。
