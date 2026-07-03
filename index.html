@@ -244,8 +244,14 @@ body{
   height:124px;cursor:pointer;
   display:flex;gap:10px;align-items:flex-start;
 }
-#m-face{width:40px;height:40px;image-rendering:pixelated;border:2px solid #fff;border-radius:4px;flex:0 0 auto;margin-top:2px}
 #msgtext{flex:1;white-space:pre-wrap;font-size:15px;line-height:1.95;letter-spacing:.02em}
+
+/* メッセージ窓の上をあるくドット絵キャラ */
+#chara{
+  position:absolute;left:16px;bottom:134px;z-index:55;
+  width:48px;height:54px;
+  image-rendering:pixelated;pointer-events:none;display:none;
+}
 #msgnext{
   position:absolute;right:14px;bottom:8px;display:none;
   animation:vbounce .7s steps(2) infinite;font-size:13px;
@@ -405,10 +411,12 @@ body{
 
   <!-- メッセージウィンドウ -->
   <div class="win" id="msgbox">
-    <canvas id="m-face" width="40" height="40"></canvas>
     <div id="msgtext"></div>
     <span id="msgnext">▼</span>
   </div>
+
+  <!-- メッセージ窓の上をあるくキャラ -->
+  <canvas id="chara" width="16" height="18"></canvas>
 
   <!-- タイトル画面 -->
   <div id="title">
@@ -505,7 +513,6 @@ body{
   }
   pixelFace(document.getElementById('t-face'), 40);
   pixelFace(document.getElementById('s-face'), 36);
-  pixelFace(document.getElementById('m-face'), 26);
 
   /* ---------- 演出（フラッシュ・ゆれ・かみふぶき） ---------- */
   var stageEl = document.getElementById('stage');
@@ -527,6 +534,106 @@ body{
       conf.appendChild(f);
     }
   })();
+
+  /* ---------- メッセージ窓の上をあるくドット絵キャラ ---------- */
+  var chara = document.getElementById('chara');
+  var cctx = chara.getContext('2d');
+  var CH_PAL = { k:'#1b1f27', s:'#f0c8a2', j:'#2b3352', w:'#ffffff', g:'#00a063', r:'#c9795f', d:'#3a415c' };
+  var CH_FRAMES = [
+    [ /* あるき（足ひらく） */
+      '....kkkkkk......',
+      '...kkkkkkkkk....',
+      '..kkkkkkkkkkk...',
+      '..kkkkkkkkkkk...',
+      '..kkkssssssk....',
+      '..kksssssssss...',
+      '..kksskssksss...',
+      '..kksssssssss...',
+      '...kssssrss.....',
+      '....sssssss.....',
+      '....kjjjjjk.....',
+      '...jjjwwjjjj....',
+      '...jjjwwgjjs....',
+      '...sjjwwjjj.....',
+      '....djjjjd......',
+      '....dd..dd......',
+      '...dd....dd.....',
+      '..kk......kk....'
+    ],
+    [ /* たち（足とじる・1pxしずむ） */
+      '................',
+      '....kkkkkk......',
+      '...kkkkkkkkk....',
+      '..kkkkkkkkkkk...',
+      '..kkkkkkkkkkk...',
+      '..kkkssssssk....',
+      '..kksssssssss...',
+      '..kksskssksss...',
+      '..kksssssssss...',
+      '...kssssrss.....',
+      '....sssssss.....',
+      '....kjjjjjk.....',
+      '...jjjwwjjjj....',
+      '...sjjwwgjjs....',
+      '....djjjjd......',
+      '....dddddd......',
+      '.....dd.dd......',
+      '....kk..kk......'
+    ]
+  ];
+  function charaDraw(fi){
+    var rows = CH_FRAMES[fi];
+    cctx.clearRect(0, 0, 16, 18);
+    for (var y = 0; y < rows.length; y++){
+      for (var x = 0; x < 16; x++){
+        var c = rows[y].charAt(x);
+        if (CH_PAL[c]){ cctx.fillStyle = CH_PAL[c]; cctx.fillRect(x, y, 1, 1); }
+      }
+    }
+  }
+  var CH_HOME = 16;
+  var ch = { mode: 'hidden', x: CH_HOME, dir: 1, tick: 0, pauseUntil: 0 };
+  function charaEnter(){ /* 左から はしってくる */
+    chara.style.display = 'block';
+    ch.x = -50; ch.dir = 1; ch.mode = 'enter';
+  }
+  function charaExit(){ /* 右へ はしりさる */
+    if (ch.mode === 'hidden') return;
+    ch.mode = 'exit'; ch.dir = 1;
+  }
+  setInterval(function(){
+    if (ch.mode === 'hidden') return;
+    ch.tick++;
+    var stageW = stageEl.clientWidth;
+    if (ch.mode === 'pace'){ /* 窓の上を のんびり うろうろ */
+      if (Date.now() < ch.pauseUntil){
+        charaDraw(1);
+      } else {
+        ch.x += ch.dir * 1.5;
+        var maxX = Math.min(150, stageW * 0.45);
+        if (ch.x <= 10){
+          ch.x = 10; ch.dir = 1;
+          if (Math.random() < 0.4) ch.pauseUntil = Date.now() + 1200 + Math.random() * 1800;
+        } else if (ch.x >= maxX){
+          ch.x = maxX; ch.dir = -1;
+          if (Math.random() < 0.4) ch.pauseUntil = Date.now() + 1200 + Math.random() * 1800;
+        }
+        charaDraw((ch.tick >> 1) & 1);
+      }
+    } else if (ch.mode === 'exit'){
+      ch.dir = 1; ch.x += 16;
+      charaDraw(ch.tick & 1);
+      if (ch.x > stageW + 50) ch.mode = 'away';
+    } else if (ch.mode === 'enter'){
+      ch.dir = 1; ch.x += 12;
+      charaDraw(ch.tick & 1);
+      if (ch.x >= CH_HOME){ ch.x = CH_HOME; ch.mode = 'pace'; }
+    } else {
+      charaDraw(1);
+    }
+    chara.style.left = ch.x + 'px';
+    chara.style.transform = ch.dir < 0 ? 'scaleX(-1)' : '';
+  }, 110);
 
   /* ---------- レベル＝年齢（1994年うまれ） ---------- */
   document.getElementById('lv').textContent = 'LV ' + (new Date().getFullYear() - 1994);
@@ -981,7 +1088,11 @@ body{
   }
 
   function go(name){
-    playWipe(function(){ SCENES[name].enter(); });
+    charaExit(); /* 右へ はしりさる */
+    playWipe(function(){
+      SCENES[name].enter();
+      charaEnter(); /* 左から もどってくる */
+    });
   }
 
   /* ---------- どうぐ（なんでも屋） ---------- */
@@ -1089,6 +1200,7 @@ body{
     playWipe(function(){
       title.classList.add('hide');
       SCENES.opening.enter();
+      charaEnter();
     });
   });
 })();
