@@ -246,11 +246,11 @@ body{
 }
 #msgtext{flex:1;white-space:pre-wrap;font-size:15px;line-height:1.95;letter-spacing:.02em}
 
-/* メッセージ窓の上をあるくドット絵キャラ */
+/* メッセージ窓の上をあるくドット絵キャラ（さわると はなしかけてくる） */
 #chara{
   position:absolute;left:16px;bottom:134px;z-index:55;
   width:48px;height:54px;
-  image-rendering:pixelated;pointer-events:none;display:none;
+  image-rendering:pixelated;pointer-events:auto;cursor:pointer;display:none;
 }
 #msgnext{
   position:absolute;right:14px;bottom:8px;display:none;
@@ -474,6 +474,7 @@ body{
     setTimeout(function(){ tone(880, .09, .02); }, 140);
   }
   function sndEncounter(){ tone(392, .09, .028); setTimeout(function(){ tone(262, .15, .028); }, 90); }
+  function sndTalk(){ tone(1568, .05, .02); setTimeout(function(){ tone(2093, .08, .02); }, 60); }
   function sndJingle(){ [523, 659, 784, 1046].forEach(function(f, i){ setTimeout(function(){ tone(f, .13, .024); }, i * 95); }); }
   function sndStart(){ [392, 523, 659, 784].forEach(function(f, i){ setTimeout(function(){ tone(f, .1, .024); }, i * 80); }); }
   function vibrate(){ if (navigator.vibrate){ try{ navigator.vibrate(10); }catch(e){} } }
@@ -592,7 +593,30 @@ body{
     }
   }
   var CH_HOME = 16;
-  var ch = { mode: 'hidden', x: CH_HOME, dir: 1, tick: 0, pauseUntil: 0 };
+  var ch = { mode: 'hidden', x: CH_HOME, dir: 1, tick: 0, pauseUntil: 0, hopUntil: 0 };
+
+  /* さわると はなしかけてくる */
+  var CH_TALK = [
+    '＊わっ！ びっくりした！',
+    '＊なでても なにも でないぞ。\n……でたら それは マジックだ。',
+    '＊この窓のうえ、けっこう ながめが いいんだ。',
+    '＊しごとの そうだんは「はなす」から どうぞ。',
+    '＊きょうも いい まほうびより だ。',
+    '＊あんまり つつくと くすぐったい！',
+    '＊うんどうぶそく かいしょうちゅう。\nじゃまを しないでくれ。',
+    '＊…じつは これ、僕の ぶんしんだ。\nほんものは いま しごとちゅう。'
+  ];
+  chara.addEventListener('click', function(e){
+    e.stopPropagation();
+    if (ch.mode !== 'pace') return;          /* はしっている最中は そっとしておく */
+    if (typing || lineQueue.length) return;  /* だいじな はなしの途中は わりこまない */
+    sndTalk(); vibrate();
+    ch.hopUntil = Date.now() + 240;          /* ぴょん */
+    ch.pauseUntil = Date.now() + 2800;       /* 立ち止まって はなす */
+    var quip = CH_TALK[Math.floor(Math.random() * CH_TALK.length)];
+    var restore = lastChoices;
+    say([quip], function(){ if (restore) showChoices(restore); });
+  });
   function charaEnter(){ /* 左から はしってくる */
     chara.style.display = 'block';
     ch.x = -50; ch.dir = 1; ch.mode = 'enter';
@@ -632,7 +656,8 @@ body{
       charaDraw(1);
     }
     chara.style.left = ch.x + 'px';
-    chara.style.transform = ch.dir < 0 ? 'scaleX(-1)' : '';
+    var hop = Date.now() < ch.hopUntil ? ' translateY(-8px)' : '';
+    chara.style.transform = (ch.dir < 0 ? 'scaleX(-1)' : '') + hop;
   }, 110);
 
   /* ---------- レベル＝年齢（1994年うまれ） ---------- */
@@ -711,6 +736,7 @@ body{
   setInterval(updateHint, 800); /* scrollイベントが間引かれる環境への保険 */
 
   /* ---------- 選択肢 ---------- */
+  var lastChoices = null; /* キャラとの雑談後に復元するため保持 */
   function padActivePanel(){
     /* 選択肢の高さぶん余白を足して、プロフィールが最後までスクロールで読めるようにする */
     var p = document.querySelector('.panel.on');
@@ -723,6 +749,7 @@ body{
     padActivePanel();
   }
   function showChoices(list){
+    lastChoices = list;
     choiceBox.innerHTML = '';
     list.forEach(function(item){
       var el;
@@ -1007,12 +1034,12 @@ body{
 
   /* ---------- アルバム ---------- */
   var ALBUM = [
-    ['assets/ryu_spread.jpg',   'ぶたいの うえが いちばん すきだ。'],
+    ['assets/ryu_spread.jpg',   'えいがを みる かんかくで マジックショーを みてほしい。'],
     ['assets/ryu_table.jpg',    'テーブルマジックは きょりが ちかいほど もりあがる。'],
     ['assets/ryu_juggle.jpg',   'なにが とびだすかは ひみつだ。'],
     ['assets/ryu_bubble.jpg',   'マジックは すこし ふしぎな にちじょう。'],
     ['assets/ryu_night.jpg',    'よるには よるの まほうが ある。'],
-    ['assets/ryu_award.jpg',    'じゅしょうの おもいで。'],
+    ['assets/ryu_award.jpg',    'じんせいは パズルだ。'],
     ['assets/ryu_fun.jpg',      'あそびごころも しごとの うちだ。']
   ];
   var alImg = document.getElementById('al-img');
