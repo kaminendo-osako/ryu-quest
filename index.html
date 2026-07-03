@@ -172,6 +172,44 @@ body{
 .g-send:active{background:#1a2340}
 .g-note{font-size:10.5px;color:#8b93a8;margin-top:8px;line-height:1.8}
 
+/* うらないカード */
+#card-area{display:flex;justify-content:center;padding:8px 0}
+#card{
+  width:118px;height:164px;border-radius:10px;background:#fff;color:#111;
+  border:3px solid #fff;box-shadow:0 0 0 3px #000, 0 6px 0 rgba(0,0,0,.55);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  font-size:38px;line-height:1;
+}
+#card.back{background:repeating-linear-gradient(45deg,#1c3aa0 0 8px,#2c4ec8 8px 16px);color:#fff;text-shadow:1px 1px 0 #000}
+#card.red{color:#d22030}
+#card small{font-size:12px;letter-spacing:.15em;color:inherit}
+#card.spin{animation:cardspin .6s ease}
+@keyframes cardspin{0%{transform:rotateY(0)}100%{transform:rotateY(720deg)}}
+
+/* ひみつ（ねんぴょう） */
+.years li{list-style:none;display:flex;gap:10px;margin:3px 0}
+.years .y{color:#9fe8ff;flex:0 0 3.8em}
+
+/* スクロールできる合図 */
+#scrollhint{
+  position:absolute;left:12px;bottom:150px;z-index:45;display:none;
+  font-size:13px;color:#fff;text-shadow:0 0 4px #000;
+  animation:vbounce .7s steps(2) infinite;pointer-events:none;
+}
+
+/* フラッシュ＆ゆれ（せんとう風エンカウント） */
+#flash{position:absolute;inset:0;z-index:88;background:#fff;opacity:0;pointer-events:none}
+#flash.go{animation:flashy .45s steps(1)}
+@keyframes flashy{0%{opacity:.85}25%{opacity:0}50%{opacity:.85}75%,100%{opacity:0}}
+#stage.shake{animation:shakey .4s linear}
+@keyframes shakey{0%,100%{transform:translate(0,0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}}
+
+/* かみふぶき（クエストクリア演出） */
+#confetti{position:absolute;inset:0;z-index:60;pointer-events:none;display:none}
+#confetti.on{display:block}
+#confetti i{position:absolute;top:-12px;width:7px;height:7px;animation:confall linear infinite}
+@keyframes confall{to{transform:translateY(108vh) rotate(720deg)}}
+
 /* ======== 選択肢ウィンドウ ======== */
 #choicebox{
   position:absolute;right:9px;bottom:146px;z-index:40;
@@ -184,8 +222,8 @@ body{
 .choice{
   display:block;width:100%;text-align:left;text-decoration:none;
   background:transparent;border:0;color:#fff;
-  font-family:inherit;font-size:14.5px;line-height:1.6;
-  padding:6px 6px 6px 26px;position:relative;cursor:pointer;
+  font-family:inherit;font-size:13.5px;line-height:1.55;
+  padding:5px 6px 5px 24px;position:relative;cursor:pointer;
 }
 .choice::before{content:"▶";position:absolute;left:5px;opacity:0}
 .choice:hover::before,.choice:focus-visible::before,.choice:active::before{opacity:1;animation:blink .5s steps(1) infinite}
@@ -196,8 +234,10 @@ body{
 #msgbox{
   position:absolute;left:8px;right:8px;bottom:10px;z-index:50;
   height:124px;cursor:pointer;
+  display:flex;gap:10px;align-items:flex-start;
 }
-#msgtext{white-space:pre-wrap;font-size:15px;line-height:1.95;letter-spacing:.02em}
+#m-face{width:40px;height:40px;image-rendering:pixelated;border:2px solid #fff;border-radius:4px;flex:0 0 auto;margin-top:2px}
+#msgtext{flex:1;white-space:pre-wrap;font-size:15px;line-height:1.95;letter-spacing:.02em}
 #msgnext{
   position:absolute;right:14px;bottom:8px;display:none;
   animation:vbounce .7s steps(2) infinite;font-size:13px;
@@ -305,11 +345,50 @@ body{
     </form>
   </div>
 
+  <!-- うらない（カード占い） -->
+  <div class="panel" id="p-uranai">
+    <div class="win">
+      <span class="cap">うらない</span>
+      <div id="card-area">
+        <div id="card" class="back"><span id="card-suit">？</span><small id="card-name"></small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ひみつ -->
+  <div class="panel" id="p-himitsu">
+    <div class="win">
+      <span class="cap">ひみつのしょ</span>
+      <ul class="quest">
+        <li>基本 いんどあ の ひきこもり</li>
+        <li>お酒と カラオケが 大すき（軽音サークル出身）</li>
+        <li>ストーリーの こった ゲームに よわい</li>
+        <li>脱出ゲームが すき。いつか どこかに 閉じこめられて 脱出してみたい</li>
+        <li>うまれつき 左耳が きこえない。のみかいは 左はしが ていいち</li>
+      </ul>
+    </div>
+    <div class="win">
+      <span class="cap">これまでの ぼうけん</span>
+      <ul class="years">
+        <li><span class="y">1994</span><span>東京都世田谷区に 爆誕</span></li>
+        <li><span class="y">2012</span><span>東京農業大学第一高校 卒業</span></li>
+        <li><span class="y">2016</span><span>日本大学 卒業 → 三井住友海上あいおい生命 入社</span></li>
+        <li><span class="y">2024</span><span>8年つとめて 退社。不動産・M&amp;A会社で 買収企業の経営を 経験</span></li>
+        <li><span class="y">その後</span><span>株式会社DiteA 代表取締役に。美容アプリ『BEAUTY MATCH』会員1万人を 達成</span></li>
+        <li><span class="y">いま</span><span>株式会社かみねんど 代表として ぼうけんちゅう！</span></li>
+      </ul>
+    </div>
+  </div>
+
   <!-- 選択肢 -->
   <div class="win" id="choicebox"></div>
 
+  <!-- スクロール合図 -->
+  <span id="scrollhint">▼</span>
+
   <!-- メッセージウィンドウ -->
   <div class="win" id="msgbox">
+    <canvas id="m-face" width="40" height="40"></canvas>
     <div id="msgtext"></div>
     <span id="msgnext">▼</span>
   </div>
@@ -323,6 +402,8 @@ body{
     <div id="t-copy">© 2026 KAMINENDO Inc.　kaminendo.art</div>
   </div>
 
+  <div id="confetti"></div>
+  <div id="flash"></div>
   <div id="wipe"></div>
   <div id="crt"></div>
 </div>
@@ -365,6 +446,9 @@ body{
     setTimeout(function(){ tone(660, .06, .02); }, 70);
     setTimeout(function(){ tone(880, .09, .02); }, 140);
   }
+  function sndEncounter(){ tone(392, .09, .028); setTimeout(function(){ tone(262, .15, .028); }, 90); }
+  function sndJingle(){ [523, 659, 784, 1046].forEach(function(f, i){ setTimeout(function(){ tone(f, .13, .024); }, i * 95); }); }
+  function sndStart(){ [392, 523, 659, 784].forEach(function(f, i){ setTimeout(function(){ tone(f, .1, .024); }, i * 80); }); }
   function vibrate(){ if (navigator.vibrate){ try{ navigator.vibrate(10); }catch(e){} } }
 
   var sndBtn = document.getElementById('snd');
@@ -402,6 +486,28 @@ body{
   }
   pixelFace(document.getElementById('t-face'), 40);
   pixelFace(document.getElementById('s-face'), 36);
+  pixelFace(document.getElementById('m-face'), 26);
+
+  /* ---------- 演出（フラッシュ・ゆれ・かみふぶき） ---------- */
+  var stageEl = document.getElementById('stage');
+  var flashEl = document.getElementById('flash');
+  function battleFx(){
+    flashEl.classList.remove('go'); void flashEl.offsetWidth; flashEl.classList.add('go');
+    stageEl.classList.remove('shake'); void stageEl.offsetWidth; stageEl.classList.add('shake');
+    sndEncounter();
+  }
+  var conf = document.getElementById('confetti');
+  (function(){
+    var colors = ['#ffd76a', '#8ef0b4', '#9fe8ff', '#ff9db0', '#ffffff'];
+    for (var i = 0; i < 36; i++){
+      var f = document.createElement('i');
+      f.style.left = (Math.random() * 100) + '%';
+      f.style.background = colors[i % colors.length];
+      f.style.animationDuration = (2.2 + Math.random() * 2.2) + 's';
+      f.style.animationDelay = (Math.random() * 2.5) + 's';
+      conf.appendChild(f);
+    }
+  })();
 
   /* ---------- レベル＝年齢（1994年うまれ） ---------- */
   document.getElementById('lv').textContent = 'LV ' + (new Date().getFullYear() - 1994);
@@ -468,8 +574,28 @@ body{
     if (lineQueue.length){ sndNext(); nextLine(); }
   }
 
+  /* ---------- スクロール合図（パネルに続きがあるとき▼を出す） ---------- */
+  var hint = document.getElementById('scrollhint');
+  function updateHint(){
+    var p = document.querySelector('.panel.on');
+    if (!p){ hint.style.display = 'none'; return; }
+    hint.style.display = (p.scrollHeight - p.scrollTop - p.clientHeight > 12) ? 'block' : 'none';
+  }
+  window.addEventListener('resize', updateHint);
+  setInterval(updateHint, 800); /* scrollイベントが間引かれる環境への保険 */
+
   /* ---------- 選択肢 ---------- */
-  function hideChoices(){ choiceBox.classList.remove('on'); choiceBox.innerHTML = ''; }
+  function padActivePanel(){
+    /* 選択肢の高さぶん余白を足して、プロフィールが最後までスクロールで読めるようにする */
+    var p = document.querySelector('.panel.on');
+    if (p) p.style.paddingBottom = (choiceBox.classList.contains('on') ? choiceBox.offsetHeight + 26 : 6) + 'px';
+    updateHint();
+  }
+  function hideChoices(){
+    choiceBox.classList.remove('on');
+    choiceBox.innerHTML = '';
+    padActivePanel();
+  }
   function showChoices(list){
     choiceBox.innerHTML = '';
     list.forEach(function(item){
@@ -491,6 +617,7 @@ body{
       choiceBox.appendChild(el);
     });
     choiceBox.classList.add('on');
+    padActivePanel();
   }
 
   /* ---------- シーン ---------- */
@@ -501,17 +628,24 @@ body{
     else bg.classList.remove('on');
   }
   function setPanel(id){
-    panels.forEach(function(p){ p.classList.toggle('on', p.id === id); });
+    conf.classList.remove('on');
+    panels.forEach(function(p){
+      p.classList.toggle('on', p.id === id);
+      p.style.paddingBottom = '';
+    });
     var p = id && document.getElementById(id);
-    if (p) p.scrollTop = 0;
+    if (p){ p.scrollTop = 0; p.addEventListener('scroll', updateHint, {passive: true}); }
+    updateHint();
   }
 
   var mainMenu = [
     { t: 'つよさ <small>マジシャンRYU</small>', f: function(){ go('status'); } },
     { t: 'しごと <small>魔法の公式LINE</small>', f: function(){ go('shigoto'); } },
     { t: 'どうぐ <small>なんでも屋</small>', f: function(){ go('dougu'); } },
+    { t: 'うらなう <small>きょうの カード</small>', f: function(){ go('uranai'); } },
     { t: 'はなす <small>お問い合わせ</small>', f: function(){ go('hanasu'); } },
-    { t: 'リンク <small>SNSなど</small>', f: function(){ go('links'); } }
+    { t: 'リンク <small>SNSなど</small>', f: function(){ go('links'); } },
+    { t: 'ひみつ <small>みては いけない</small>', f: function(){ go('himitsu'); } }
   ];
   function backChoice(){ return { t: 'もどる', f: function(){ go('opening'); } }; }
 
@@ -542,6 +676,7 @@ body{
       enter: function(){
         setBg('assets/ryu_magic.jpg');
         setPanel('p-status');
+        startLvCount();
         say(['＊マジシャンRYUの「つよさ」を ひらいた！'], function(){
           showChoices([
             { t: 'しゅつえんを そうだんする', f: function(){ go('hanasu'); } },
@@ -590,16 +725,40 @@ body{
         });
       }
     },
+    uranai: {
+      enter: function(){
+        setBg(null);
+        setPanel('p-uranai');
+        resetCard();
+        say(['＊マジシャンの カードうらない だ。\nこころを きめて カードを ひいてくれ。'], function(){
+          showChoices([
+            { t: 'カードを ひく', f: drawCard },
+            backChoice()
+          ]);
+        });
+      }
+    },
+    himitsu: {
+      enter: function(){
+        setBg(null);
+        setPanel('p-himitsu');
+        say(['＊…みたな？',
+             '＊まあいい。ここまで きたきみには\n「ひみつのしょ」を みせてやろう。'], function(){
+          showChoices([
+            { t: 'なかよく なれそうだ', f: function(){ go('hanasu'); } },
+            backChoice()
+          ]);
+        });
+      }
+    },
     hanasu: {
       enter: function(){
         setBg(null);
         setPanel(null);
-        say(['＊僕に ようかい？\nしごとの はなしなら 大かんげいだ。'], function(){
-          showChoices([
-            { t: 'こうしきLINEで はなす <small>いちばん はやい</small>', href: LINK.line },
-            { t: 'てがみを かく <small>メールフォーム</small>', f: function(){ go('form'); } },
-            backChoice()
-          ]);
+        battleFx();
+        say(['＊RYUが あらわれた！',
+             '＊…じゃなくて。僕に ようかい？\nしごとの はなしなら 大かんげいだ。'], function(){
+          showChoices(hanasuChoices());
         });
       }
     },
@@ -619,8 +778,10 @@ body{
       enter: function(){
         setBg(null);
         setPanel(null);
+        conf.classList.add('on');
+        sndJingle();
         say(['＊てがみを おくった！',
-             '＊へんじが とどくまで しばし またれよ。',
+             '＊クエストクリア！ …てきな きぶんだ。\nへんじが とどくまで しばし またれよ。',
              '＊いそぎの ようけんは\nこうしきLINEが いちばん はやいぞ！'], function(){
           showChoices([
             { t: 'こうしきLINEを ともだちついか', href: LINK.line },
@@ -630,6 +791,102 @@ body{
       }
     }
   };
+
+  /* ---------- はなす（せんとう風）：にげられるか？ ---------- */
+  function hanasuChoices(){
+    return [
+      { t: 'こうしきLINEで はなす <small>いちばん はやい</small>', href: LINK.line },
+      { t: 'てがみを かく <small>メールフォーム</small>', f: function(){ go('form'); } },
+      { t: 'にげる', f: tryEscape }
+    ];
+  }
+  function tryEscape(){
+    if (Math.random() < 0.5){
+      battleFx();
+      say(['＊にげだした！', '＊しかし まわりこまれてしまった！'], function(){
+        showChoices(hanasuChoices());
+      });
+    } else {
+      say(['＊うまく にげきれた！'], function(){
+        setTimeout(function(){ go('opening'); }, 350);
+      });
+    }
+  }
+
+  /* ---------- うらない（カード） ---------- */
+  var cardEl = document.getElementById('card');
+  var cardSuit = document.getElementById('card-suit');
+  var cardName = document.getElementById('card-name');
+  var SUITS = [['♠', false, 'しごと運'], ['♥', true, 'あい運'], ['♦', true, 'かね運'], ['♣', false, 'けんこう運']];
+  var RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  var FORTUNES = [
+    'きょうは なにを やっても うまくいく きがするぞ。',
+    'あたらしいことを はじめるには いい日だ。',
+    'ちいさな しっぱいは わらいに かえてしまおう。',
+    'こまったら だれかに そうだんしよう。僕でも いいぞ。',
+    'ごはんを しっかり たべると うんきが あがるぞ。',
+    'きょう であった人を たいせつに するといい。',
+    'むりは しなくていい。やすむのも ぼうけんの うちだ。',
+    'おもいきった ちょうせんが きち と でている！'
+  ];
+  function resetCard(){
+    cardEl.className = 'back';
+    cardSuit.textContent = '？';
+    cardName.textContent = '';
+  }
+  function drawCard(){
+    hideChoices();
+    cardEl.classList.remove('spin'); void cardEl.offsetWidth;
+    cardEl.classList.add('spin');
+    sndWipe();
+    setTimeout(function(){
+      if (Math.random() < 0.06){ /* レア：ジョーカー */
+        cardEl.className = 'red spin';
+        cardSuit.textContent = '🃏';
+        cardName.textContent = 'JOKER';
+        battleFx();
+        say(['＊ジョーカー！？ これは めずらしい…',
+             '＊きょうは「僕に そうだんすると いい日」\nらしいぞ。うらないは ぜったいだ。'], function(){
+          showChoices([
+            { t: 'そうだんしてみる', f: function(){ go('hanasu'); } },
+            { t: 'もういちど ひく', f: drawCard },
+            backChoice()
+          ]);
+        });
+      } else {
+        var su = SUITS[Math.floor(Math.random() * SUITS.length)];
+        var rk = RANKS[Math.floor(Math.random() * RANKS.length)];
+        cardEl.className = su[1] ? 'red spin' : 'spin';
+        cardSuit.textContent = su[0] + rk;
+        cardName.textContent = su[2];
+        say(['＊' + su[0] + 'の' + rk + '。「' + su[2] + '」の カードだ。\n' + FORTUNES[Math.floor(Math.random() * FORTUNES.length)]], function(){
+          showChoices([
+            { t: 'もういちど ひく', f: drawCard },
+            backChoice()
+          ]);
+        });
+      }
+    }, 320);
+  }
+
+  /* ---------- LVカウントアップ演出 ---------- */
+  var lvTimer = null;
+  function startLvCount(){
+    var lvEl = document.getElementById('lv');
+    var target = new Date().getFullYear() - 1994;
+    if (lvTimer){ clearInterval(lvTimer); lvTimer = null; }
+    var cur = 1;
+    lvEl.textContent = 'LV 1';
+    lvTimer = setInterval(function(){
+      cur++;
+      lvEl.textContent = 'LV ' + cur;
+      if (cur % 4 === 0) tone(980, .03, .01);
+      if (cur >= target){
+        clearInterval(lvTimer); lvTimer = null;
+        tone(1470, .12, .02);
+      }
+    }, 45);
+  }
 
   /* ---------- ワイプ遷移 ---------- */
   var wipe = document.getElementById('wipe');
@@ -748,7 +1005,7 @@ body{
   var title = document.getElementById('title');
   title.addEventListener('click', function(){
     ac();               /* ユーザー操作で音を解禁 */
-    sndSelect();
+    sndStart();
     playWipe(function(){
       title.classList.add('hide');
       SCENES.opening.enter();
