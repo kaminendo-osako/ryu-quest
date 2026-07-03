@@ -1,0 +1,10 @@
+# 非公開資料（サービス資料PDF等）はリポジトリに含めない
+doc/
+
+# 旧バージョンのバックアップ
+index_v1_card.html
+
+# OSゴミファイル
+Thumbs.db
+desktop.ini
+.DS_Store

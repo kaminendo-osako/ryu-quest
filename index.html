@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RYU QUEST｜大迫龍太（Magician RYU × 株式会社かみねんど）</title>
+<meta name="description" content="マジシャンで 社長で なんでも屋。大迫龍太のプロフィールをRPG風にお届け。出演依頼・魔法の公式LINE・お問い合わせはこちらから。">
+<meta property="og:title" content="RYU QUEST｜大迫龍太">
+<meta property="og:description" content="マジシャンで 社長で なんでも屋。ようけんを えらんでくれ！">
+<meta property="og:image" content="assets/ryu_portrait.jpg">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AE%3C/text%3E%3C/svg%3E">
+<link rel="preload" as="image" href="assets/ryu_portrait.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:#000;
+  font-family:'DotGothic16','MS Gothic','ＭＳ ゴシック',monospace;
+  color:#fff;
+  overflow:hidden;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* ======== ステージ（縦型・スマホ画面いっぱい／PCは中央レターボックス） ======== */
+#stage{
+  position:relative;
+  height:100dvh;
+  width:min(100vw, calc(100dvh * .5625));
+  margin:0 auto;
+  overflow:hidden;
+  background:#000;
+  touch-action:manipulation;
+}
+
+/* 背景写真（シーンによって差し替え・暗め表示） */
+#bg{position:absolute;inset:0;background-size:cover;background-position:center 20%;opacity:0;transition:opacity .5s ease;filter:brightness(.42) contrast(1.05)}
+#bg.on{opacity:1}
+
+/* 星空 */
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars i{position:absolute;width:2px;height:2px;background:#fff;animation:twinkle 2.4s infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.9}}
+
+/* ワイプ遷移（タイルが対角線状に画面を覆う→ひらく） */
+#wipe{
+  position:absolute;inset:0;z-index:85;pointer-events:none;
+  display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(14,1fr);
+}
+#wipe.block{pointer-events:auto}
+#wipe i{background:#000;transform:scale(0)}
+#wipe.cover i{animation:tileIn .3s steps(4) forwards}
+#wipe.reveal i{animation:tileOut .3s steps(4) forwards}
+@keyframes tileIn{from{transform:scale(0)}to{transform:scale(1.05)}}
+@keyframes tileOut{from{transform:scale(1.05)}to{transform:scale(0)}}
+
+/* ウィンドウのポップ登場（シーン切替時に順番に出る） */
+.panel.on .win{animation:winPop .22s steps(3) both}
+.panel.on .win:nth-child(2){animation-delay:.09s}
+.panel.on .win:nth-child(3){animation-delay:.18s}
+#choicebox.on{animation:winPop .18s steps(3) both}
+@keyframes winPop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* 走査線（ブラウン管風・ごく薄く） */
+#crt{
+  position:absolute;inset:0;z-index:90;pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+  opacity:.45;
+}
+
+/* ======== ウィンドウ（RPG風） ======== */
+.win{
+  position:relative;
+  background:rgba(2,4,14,.93);
+  border:3px solid #fff;
+  border-radius:8px;
+  box-shadow:0 0 0 3px #000, inset 0 0 0 2px #000;
+  color:#fff;
+  padding:12px 13px;
+  line-height:1.85;
+  font-size:14px;
+}
+.win .cap{
+  position:absolute;top:-11px;left:10px;
+  background:#000;border:2px solid #fff;border-radius:5px;
+  padding:0 8px;font-size:11px;line-height:1.6;letter-spacing:.1em;
+}
+
+/* ======== タイトル画面 ======== */
+#title{
+  position:absolute;inset:0;z-index:80;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  cursor:pointer;background:#000;
+  transition:opacity .4s ease;
+}
+#title.hide{opacity:0;pointer-events:none}
+#t-face{width:112px;height:112px;image-rendering:pixelated;border:3px solid #fff;border-radius:6px;box-shadow:0 0 0 3px #000, 0 0 24px rgba(120,180,255,.25)}
+#t-logo{font-size:44px;letter-spacing:.12em;text-shadow:3px 3px 0 #1c3aa0, -1px -1px 0 #000;margin-top:6px}
+#t-sub{font-size:13px;letter-spacing:.2em;color:#cfd8ff}
+#t-start{margin-top:22px;font-size:15px;letter-spacing:.25em;animation:blink 1s steps(1) infinite}
+#t-copy{position:absolute;bottom:18px;font-size:10px;color:#8b93a8;letter-spacing:.15em}
+@keyframes blink{0%,60%{opacity:1}61%,100%{opacity:0}}
+
+/* ======== 上部バー ======== */
+#topbar{
+  position:absolute;top:8px;left:8px;right:8px;z-index:70;
+  display:flex;justify-content:space-between;align-items:center;pointer-events:none;
+}
+#topbar .chip{
+  background:#000;border:2px solid #fff;border-radius:5px;
+  padding:2px 9px;font-size:11px;letter-spacing:.12em;pointer-events:auto;
+}
+#snd{cursor:pointer;color:#fff;font-family:inherit}
+
+/* ======== パネル領域（シーンごとの情報ウィンドウ群） ======== */
+.panel{
+  position:absolute;top:44px;left:9px;right:9px;bottom:142px;z-index:10;
+  overflow-y:auto;scrollbar-width:none;
+  display:none;flex-direction:column;gap:18px;padding-top:12px;padding-bottom:6px;
+}
+.panel::-webkit-scrollbar{display:none}
+.panel.on{display:flex}
+
+/* ステータス画面 */
+.st-row{display:flex;gap:12px;align-items:flex-start}
+.st-row .st-main{flex:1}
+#s-face{width:84px;height:84px;image-rendering:pixelated;border:2px solid #fff;border-radius:4px;flex:0 0 auto}
+.st-line{display:flex;justify-content:space-between;gap:8px}
+.st-line .k{color:#9fe8ff}
+.quest li{list-style:none;padding-left:1.2em;text-indent:-1.2em;margin:2px 0}
+.quest li::before{content:"★";color:#ffd76a;margin-right:.35em}
+.small{font-size:11.5px;line-height:1.9;color:#c8d2cd}
+.small b{color:#fff;font-weight:normal}
+
+/* じゅもん・スキル */
+.skill li{list-style:none;padding-left:1.1em;text-indent:-1.1em;margin:2px 0}
+.skill li::before{content:"▶";color:#8ef0b4;margin-right:.35em;font-size:11px}
+.gold{color:#ffd76a}
+.cyan{color:#9fe8ff}
+.grn{color:#8ef0b4}
+
+/* どうぐリスト */
+.item-btn{
+  display:block;width:100%;text-align:left;
+  background:transparent;border:0;color:#fff;
+  font-family:inherit;font-size:14px;line-height:1.5;
+  padding:6px 4px 6px 24px;position:relative;cursor:pointer;
+}
+.item-btn::before{content:"▶";position:absolute;left:4px;opacity:0}
+.item-btn:hover::before,.item-btn:active::before,.item-btn.sel::before{opacity:1}
+.item-btn.sel{color:#ffd76a}
+
+/* フォーム */
+.g-form label{display:block;font-size:12px;color:#9fe8ff;margin:10px 0 4px}
+.g-form input,.g-form textarea{
+  width:100%;background:#000;border:2px solid #fff;border-radius:4px;
+  color:#fff;font-family:inherit;font-size:16px;padding:8px 9px;
+  outline:none;caret-color:#8ef0b4;
+}
+.g-form input:focus,.g-form textarea:focus{border-color:#8ef0b4}
+.g-form textarea{min-height:84px;resize:vertical}
+.g-send{
+  display:block;width:100%;margin-top:14px;
+  background:#000;border:3px solid #fff;border-radius:6px;
+  color:#fff;font-family:inherit;font-size:15px;letter-spacing:.1em;
+  padding:11px;cursor:pointer;
+}
+.g-send:active{background:#1a2340}
+.g-note{font-size:10.5px;color:#8b93a8;margin-top:8px;line-height:1.8}
+
+/* ======== 選択肢ウィンドウ ======== */
+#choicebox{
+  position:absolute;right:9px;bottom:146px;z-index:40;
+  min-width:66%;max-width:calc(100% - 18px);max-height:44%;
+  overflow-y:auto;scrollbar-width:none;
+  display:none;
+}
+#choicebox::-webkit-scrollbar{display:none}
+#choicebox.on{display:block}
+.choice{
+  display:block;width:100%;text-align:left;text-decoration:none;
+  background:transparent;border:0;color:#fff;
+  font-family:inherit;font-size:14.5px;line-height:1.6;
+  padding:6px 6px 6px 26px;position:relative;cursor:pointer;
+}
+.choice::before{content:"▶";position:absolute;left:5px;opacity:0}
+.choice:hover::before,.choice:focus-visible::before,.choice:active::before{opacity:1;animation:blink .5s steps(1) infinite}
+.choice:hover{color:#ffd76a}
+.choice small{color:#8b93a8;font-size:11px;margin-left:6px}
+
+/* ======== メッセージウィンドウ ======== */
+#msgbox{
+  position:absolute;left:8px;right:8px;bottom:10px;z-index:50;
+  height:124px;cursor:pointer;
+}
+#msgtext{white-space:pre-wrap;font-size:15px;line-height:1.95;letter-spacing:.02em}
+#msgnext{
+  position:absolute;right:14px;bottom:8px;display:none;
+  animation:vbounce .7s steps(2) infinite;font-size:13px;
+}
+@keyframes vbounce{0%{transform:translateY(0)}100%{transform:translateY(3px)}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div id="stars"></div>
+
+  <!-- 上部バー -->
+  <div id="topbar">
+    <span class="chip">RYU QUEST</span>
+    <button class="chip" id="snd" type="button">おと:ON</button>
+  </div>
+
+  <!-- ステータス（つよさ） -->
+  <div class="panel" id="p-status">
+    <div class="win">
+      <span class="cap">つよさ</span>
+      <div class="st-row">
+        <canvas id="s-face" width="84" height="84"></canvas>
+        <div class="st-main">
+          <div class="st-line"><span>おおさこ りゅうた</span><span class="gold" id="lv">LV 32</span></div>
+          <div class="st-line"><span class="k">しょくぎょう</span><span>マジシャン／社長</span></div>
+          <div class="st-line"><span class="k">ＨＰ</span><span>ひみつ</span></div>
+          <div class="st-line"><span class="k">ＭＰ</span><span>むげん</span></div>
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <div class="st-line"><span class="k">とくぎ</span><span>マジック／アイデア</span></div>
+        <div class="st-line"><span class="k">しょうごう</span><span class="gold">なんでも屋</span></div>
+        <div class="st-line"><span class="k">せいかく</span><span>いんどあ（酒とカラオケは好き）</span></div>
+      </div>
+    </div>
+    <div class="win">
+      <span class="cap">クエストクリアきろく</span>
+      <ul class="quest">
+        <li>活動2年目 マジック大会 入賞</li>
+        <li>銀座 Bar &amp; Magic ACE 出演中</li>
+        <li>六本木 Magic bar M.o.L 出演中</li>
+        <li>オーストラリア130公演 クリア</li>
+        <li>定期公演『FROM』を 主宰</li>
+        <li>ＴＶ『有吉ジャポン』に 出現</li>
+      </ul>
+    </div>
+    <div class="win small">
+      <span class="cap">じっせき</span>
+      <b>ご依頼企業：</b>フィデリティ投信／アクサ生命／プルデンシャル生命／三井住友海上あいおい生命 ほか<br>
+      <b>出演場所：</b>グランドハイアット東京／ホテル雅叙園東京／八芳園／ホテルニューオータニ ほか<br>
+      <b>フィールド：</b>結婚式・企業パーティ・テーブルマジック・商業施設・ライブイベント
+    </div>
+  </div>
+
+  <!-- しごと（かみねんど） -->
+  <div class="panel" id="p-shigoto">
+    <div class="win">
+      <span class="cap">かいしゃ</span>
+      株式会社かみねんど<br>
+      代表取締役　大迫 龍太<br>
+      <span class="cyan">「想像力を、創造する。」</span>
+    </div>
+    <div class="win">
+      <span class="cap">じゅもん</span>
+      <span class="gold">まほうのこうしきLINE</span><br>
+      <span class="cyan">こうか：</span>公式LINEを 売り上げにつながる<br>武器へと 変える。<br>
+      <ul class="skill" style="margin-top:6px">
+        <li><span class="grn">こうちく</span>　ゼロから専用設計</li>
+        <li><span class="grn">うんよう</span>　配信も分析も 丸投げOK</li>
+        <li><span class="grn">かいぜん</span>　データで課題を特定</li>
+        <li><span class="grn">かいはつ</span>　ほしい機能を 作る</li>
+      </ul>
+    </div>
+    <div class="win">
+      <span class="cap">おしらせ</span>
+      いま <span class="gold">無料アカウント診断</span> 実施中！<br>
+      10ページごえの レポートを<br>
+      <span class="cyan">むりょう</span> で もらえるぞ。<br>
+      <span class="small">※しつこい営業は 一切 でてこない。</span>
+    </div>
+  </div>
+
+  <!-- どうぐ（なんでも屋） -->
+  <div class="panel" id="p-dougu">
+    <div class="win">
+      <span class="cap">どうぐぶくろ</span>
+      <div id="item-list"></div>
+    </div>
+  </div>
+
+  <!-- てがみ（フォーム） -->
+  <div class="panel" id="p-form">
+    <form class="win g-form" id="letter">
+      <span class="cap">てがみを かく</span>
+      <label for="f-name">なまえ</label>
+      <input id="f-name" type="text" placeholder="くうらんでも OK" autocomplete="name">
+      <label for="f-mail">メール</label>
+      <input id="f-mail" type="email" placeholder="くうらんでも OK" autocomplete="email">
+      <label for="f-body">ようけん</label>
+      <textarea id="f-body" placeholder="れい）11がつのパーティで マジックショーを おねがいしたい"></textarea>
+      <button class="g-send" type="submit">▶ てがみを おくる</button>
+      <p class="g-note">そうしんすると メールアプリが ひらく。<br>あてさき：osako@kaminendo.art（TEL 070-9190-3539）</p>
+    </form>
+  </div>
+
+  <!-- 選択肢 -->
+  <div class="win" id="choicebox"></div>
+
+  <!-- メッセージウィンドウ -->
+  <div class="win" id="msgbox">
+    <div id="msgtext"></div>
+    <span id="msgnext">▼</span>
+  </div>
+
+  <!-- タイトル画面 -->
+  <div id="title">
+    <canvas id="t-face" width="112" height="112"></canvas>
+    <div id="t-logo">RYU QUEST</div>
+    <div id="t-sub">マジシャンで 社長で なんでも屋</div>
+    <div id="t-start">▶ PUSH START</div>
+    <div id="t-copy">© 2026 KAMINENDO Inc.　kaminendo.art</div>
+  </div>
+
+  <div id="wipe"></div>
+  <div id="crt"></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- リンク ---------- */
+  var LINK = {
+    line: 'https://line.me/R/ti/p/@687czsmv',
+    insta: 'https://www.instagram.com/ryu_entertainment0/',
+    x: 'https://x.com/ryu0035',
+    web: 'https://kaminendo.art/'
+  };
+
+  /* ---------- 効果音（ファミコン風・ちいさめ） ---------- */
+  var AC = null, muted = false;
+  function ac(){
+    if (!AC){ try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }
+    if (AC && AC.state === 'suspended') AC.resume();
+    return AC;
+  }
+  function tone(freq, dur, vol){
+    if (muted) return;
+    var a = ac(); if (!a) return;
+    var o = a.createOscillator(), g = a.createGain();
+    o.type = 'square'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || .02, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, a.currentTime + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + dur);
+  }
+  function sndText(){ tone(1750, .03, .011); }
+  function sndNext(){ tone(1150, .05, .018); }
+  function sndSelect(){ tone(880, .05, .022); setTimeout(function(){ tone(1320, .08, .022); }, 55); }
+  function sndOpen(){ tone(620, .07, .02); }
+  function sndWipe(){
+    tone(440, .06, .02);
+    setTimeout(function(){ tone(660, .06, .02); }, 70);
+    setTimeout(function(){ tone(880, .09, .02); }, 140);
+  }
+  function vibrate(){ if (navigator.vibrate){ try{ navigator.vibrate(10); }catch(e){} } }
+
+  var sndBtn = document.getElementById('snd');
+  sndBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    muted = !muted;
+    sndBtn.textContent = muted ? 'おと:OFF' : 'おと:ON';
+    if (!muted) sndSelect();
+  });
+
+  /* ---------- 星空 ---------- */
+  var stars = document.getElementById('stars');
+  for (var i = 0; i < 42; i++){
+    var s = document.createElement('i');
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.top = (Math.random() * 100) + '%';
+    s.style.animationDelay = (Math.random() * 2.4) + 's';
+    stars.appendChild(s);
+  }
+
+  /* ---------- ドット絵ふうポートレート ---------- */
+  function pixelFace(canvas, px){
+    var img = new Image();
+    img.onload = function(){
+      var s = img.width;                     /* 正方形に切り出し（顔まわり） */
+      var sy = Math.round(img.height * .06);
+      var small = document.createElement('canvas');
+      small.width = px; small.height = px;
+      small.getContext('2d').drawImage(img, 0, sy, s, s, 0, 0, px, px);
+      var c = canvas.getContext('2d');
+      c.imageSmoothingEnabled = false;
+      c.drawImage(small, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = 'assets/ryu_portrait.jpg';
+  }
+  pixelFace(document.getElementById('t-face'), 40);
+  pixelFace(document.getElementById('s-face'), 36);
+
+  /* ---------- レベル＝年齢（1994年うまれ） ---------- */
+  document.getElementById('lv').textContent = 'LV ' + (new Date().getFullYear() - 1994);
+
+  /* ---------- メッセージエンジン（タイプライター＋タップ送り） ---------- */
+  var msgText = document.getElementById('msgtext');
+  var msgNext = document.getElementById('msgnext');
+  var choiceBox = document.getElementById('choicebox');
+  var typing = false, typeTimer = null, curLine = '', lineQueue = [], afterSay = null, sayTimer = null;
+
+  function clearType(){
+    if (typeTimer){ clearInterval(typeTimer); typeTimer = null; }
+    if (sayTimer){ clearTimeout(sayTimer); sayTimer = null; }
+    typing = false;
+    lineQueue = [];
+    afterSay = null;
+    msgNext.style.display = 'none';
+  }
+  function finishSay(){
+    if (afterSay){ var f = afterSay; afterSay = null; f(); }
+  }
+  function typeLine(text){
+    curLine = text;
+    typing = true;
+    msgText.textContent = '';
+    msgNext.style.display = 'none';
+    var i = 0;
+    typeTimer = setInterval(function(){
+      msgText.textContent += text.charAt(i);
+      if (i % 3 === 0) sndText();
+      i++;
+      if (i >= text.length){
+        clearInterval(typeTimer); typeTimer = null; typing = false;
+        if (lineQueue.length){ msgNext.style.display = 'block'; }
+        else finishSay();
+      }
+    }, 26);
+  }
+  function nextLine(){
+    if (sayTimer){ clearTimeout(sayTimer); sayTimer = null; }
+    if (!lineQueue.length){ finishSay(); return; }
+    typeLine(lineQueue.shift());
+  }
+  function say(lines, done){
+    clearType();
+    hideChoices();
+    lineQueue = lines.slice();
+    afterSay = done || null;
+    if (wiping){ /* ワイプが ひらいてから しゃべりはじめる */
+      msgText.textContent = '';
+      sayTimer = setTimeout(function(){ sayTimer = null; nextLine(); }, 520);
+    } else {
+      nextLine();
+    }
+  }
+  function advance(){
+    if (typing){
+      clearInterval(typeTimer); typeTimer = null; typing = false;
+      msgText.textContent = curLine;
+      if (lineQueue.length) msgNext.style.display = 'block';
+      else finishSay();
+      return;
+    }
+    if (lineQueue.length){ sndNext(); nextLine(); }
+  }
+
+  /* ---------- 選択肢 ---------- */
+  function hideChoices(){ choiceBox.classList.remove('on'); choiceBox.innerHTML = ''; }
+  function showChoices(list){
+    choiceBox.innerHTML = '';
+    list.forEach(function(item){
+      var el;
+      if (item.href){
+        el = document.createElement('a');
+        el.href = item.href; el.target = '_blank'; el.rel = 'noopener';
+      } else {
+        el = document.createElement('button');
+        el.type = 'button';
+      }
+      el.className = 'choice';
+      el.innerHTML = item.t;
+      el.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        sndSelect(); vibrate();
+        if (item.f) item.f();
+      });
+      choiceBox.appendChild(el);
+    });
+    choiceBox.classList.add('on');
+  }
+
+  /* ---------- シーン ---------- */
+  var bg = document.getElementById('bg');
+  var panels = document.querySelectorAll('.panel');
+  function setBg(src){
+    if (src){ bg.style.backgroundImage = 'url(' + src + ')'; bg.classList.add('on'); }
+    else bg.classList.remove('on');
+  }
+  function setPanel(id){
+    panels.forEach(function(p){ p.classList.toggle('on', p.id === id); });
+    var p = id && document.getElementById(id);
+    if (p) p.scrollTop = 0;
+  }
+
+  var mainMenu = [
+    { t: 'つよさ <small>マジシャンRYU</small>', f: function(){ go('status'); } },
+    { t: 'しごと <small>魔法の公式LINE</small>', f: function(){ go('shigoto'); } },
+    { t: 'どうぐ <small>なんでも屋</small>', f: function(){ go('dougu'); } },
+    { t: 'はなす <small>お問い合わせ</small>', f: function(){ go('hanasu'); } },
+    { t: 'リンク <small>SNSなど</small>', f: function(){ go('links'); } }
+  ];
+  function backChoice(){ return { t: 'もどる', f: function(){ go('opening'); } }; }
+
+  /* 時間帯あいさつ＋ぼうけんのかいすう */
+  var hour = new Date().getHours();
+  var hello = (hour >= 5 && hour < 11) ? '＊おはようございます！'
+            : (hour >= 11 && hour < 18) ? '＊こんにちは！'
+            : '＊こんばんは！';
+  var visits = 1;
+  try {
+    visits = (parseInt(localStorage.getItem('ryu_quest_visits') || '0', 10) || 0) + 1;
+    localStorage.setItem('ryu_quest_visits', String(visits));
+  } catch(e){}
+
+  var SCENES = {
+    opening: {
+      enter: function(){
+        setBg('assets/ryu_portrait.jpg');
+        setPanel(null);
+        var lines = [hello];
+        if (visits >= 2) lines.push('＊おかえりなさい！\nこれで ' + visits + 'かいめの ぼうけんだ。');
+        lines.push('＊僕は 大迫龍太（おおさこ りゅうた）。\nマジシャンで 社長で なんでも屋だ。');
+        lines.push('＊ようけんを えらんでくれ！');
+        say(lines, function(){ showChoices(mainMenu); });
+      }
+    },
+    status: {
+      enter: function(){
+        setBg('assets/ryu_magic.jpg');
+        setPanel('p-status');
+        say(['＊マジシャンRYUの「つよさ」を ひらいた！'], function(){
+          showChoices([
+            { t: 'しゅつえんを そうだんする', f: function(){ go('hanasu'); } },
+            { t: 'Instagramを のぞく', href: LINK.insta },
+            backChoice()
+          ]);
+        });
+      }
+    },
+    shigoto: {
+      enter: function(){
+        setBg(null);
+        setPanel('p-shigoto');
+        say(['＊かみねんどの メインクエストは\n「魔法の公式LINE」だ。',
+             '＊きみの公式LINEも 売れる武器に\nかえられるぞ。'], function(){
+          showChoices([
+            { t: 'むりょうしんだんを うける', href: LINK.line },
+            { t: 'Webサイトを みる', href: LINK.web },
+            { t: 'くわしく そうだんする', f: function(){ go('hanasu'); } },
+            backChoice()
+          ]);
+        });
+      }
+    },
+    dougu: {
+      enter: function(){
+        setBg(null);
+        setPanel('p-dougu');
+        say(['＊なんでも屋の どうぐぶくろを ひらいた！\nきになる どうぐを えらんでくれ。'], function(){
+          showChoices(douguChoices());
+        });
+      }
+    },
+    links: {
+      enter: function(){
+        setBg(null);
+        setPanel(null);
+        say(['＊そとの せかいへ つながる とびらだ。'], function(){
+          showChoices([
+            { t: 'Instagram <small>ryu_entertainment0</small>', href: LINK.insta },
+            { t: 'X <small>ryu0035</small>', href: LINK.x },
+            { t: 'Webサイト <small>kaminendo.art</small>', href: LINK.web },
+            { t: 'こうしきLINE <small>@687czsmv</small>', href: LINK.line },
+            backChoice()
+          ]);
+        });
+      }
+    },
+    hanasu: {
+      enter: function(){
+        setBg(null);
+        setPanel(null);
+        say(['＊僕に ようかい？\nしごとの はなしなら 大かんげいだ。'], function(){
+          showChoices([
+            { t: 'こうしきLINEで はなす <small>いちばん はやい</small>', href: LINK.line },
+            { t: 'てがみを かく <small>メールフォーム</small>', f: function(){ go('form'); } },
+            backChoice()
+          ]);
+        });
+      }
+    },
+    form: {
+      enter: function(){
+        setBg(null);
+        setPanel('p-form');
+        say(['＊てがみを かいてくれ。\nかきおわったら「おくる」を おしてくれよな。'], function(){
+          showChoices([
+            { t: 'やっぱり LINEで はなす', href: LINK.line },
+            { t: 'もどる', f: function(){ go('hanasu'); } }
+          ]);
+        });
+      }
+    },
+    thanks: {
+      enter: function(){
+        setBg(null);
+        setPanel(null);
+        say(['＊てがみを おくった！',
+             '＊へんじが とどくまで しばし またれよ。',
+             '＊いそぎの ようけんは\nこうしきLINEが いちばん はやいぞ！'], function(){
+          showChoices([
+            { t: 'こうしきLINEを ともだちついか', href: LINK.line },
+            { t: 'さいしょに もどる', f: function(){ go('opening'); } }
+          ]);
+        });
+      }
+    }
+  };
+
+  /* ---------- ワイプ遷移 ---------- */
+  var wipe = document.getElementById('wipe');
+  (function(){
+    for (var r = 0; r < 14; r++){
+      for (var c = 0; c < 8; c++){
+        var tile = document.createElement('i');
+        tile.style.animationDelay = ((r + c) * 15) + 'ms';
+        wipe.appendChild(tile);
+      }
+    }
+  })();
+  var WIPE_MS = 640; /* 最大ディレイ(13+7)*15 + アニメ300ms */
+  var wiping = false;
+  function playWipe(atCovered){
+    if (wiping){ atCovered(); return; }
+    wiping = true;
+    sndWipe();
+    wipe.classList.add('block');
+    wipe.classList.remove('reveal');
+    void wipe.offsetWidth;
+    wipe.classList.add('cover');
+    setTimeout(function(){
+      atCovered();
+      wipe.classList.remove('cover');
+      void wipe.offsetWidth;
+      wipe.classList.add('reveal');
+      setTimeout(function(){
+        wipe.classList.remove('reveal', 'block');
+        wiping = false;
+      }, WIPE_MS);
+    }, WIPE_MS);
+  }
+
+  function go(name){
+    playWipe(function(){ SCENES[name].enter(); });
+  }
+
+  /* ---------- どうぐ（なんでも屋） ---------- */
+  var ITEMS = [
+    { n: 'TikTok運用代行',
+      d: '＊完全成果報酬制！ 初期費用0円・固定費0円、1再生1円〜。\n自社アプリで 再生数50万回を たたきだした ノウハウつきだ。' },
+    { n: 'ECの売上向上',
+      d: '＊確実に ECショップの売上を あげる。\n広告費にかける予定の よさん、まず 僕に つかわせてくれ。' },
+    { n: '写真撮影',
+      d: '＊仕事が来る 宣材写真と、撮影工程から おもしろい 売れる商品写真。\nパフォーマーの撮影も とくいだ。' },
+    { n: 'システム開発翻訳',
+      d: '＊「作りたい人」と エンジニアの あいだに立つ 翻訳者になる。\nすれちがいのない 開発が できるぞ。' },
+    { n: '社内DX化',
+      d: '＊業務を 徹底ヒアリングして、導入ハードルの低い DX化。\nIT導入補助金の かつようも おまかせだ。' },
+    { n: '本の自炊代行',
+      d: '＊家の本を 一気にPDF化。1冊200円〜。\n本棚が からっぽになる ふしぎな どうぐだ。' },
+    { n: 'アイデア相談',
+      d: '＊SNSで拡散される 唯一無二の 演出アイデアを さずけよう。\n必ずフォローされる名刺も 作れるぞ。' }
+  ];
+  var itemList = document.getElementById('item-list');
+  ITEMS.forEach(function(item, idx){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'item-btn';
+    b.textContent = item.n;
+    b.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      sndSelect(); vibrate();
+      itemList.querySelectorAll('.item-btn').forEach(function(x){ x.classList.remove('sel'); });
+      b.classList.add('sel');
+      say([item.d], function(){ showChoices(douguChoices(item.n)); });
+    });
+    itemList.appendChild(b);
+  });
+  function douguChoices(itemName){
+    var list = [];
+    if (itemName){
+      list.push({ t: 'これを そうだんする', f: function(){ go('hanasu'); } });
+    }
+    list.push(backChoice());
+    return list;
+  }
+
+  /* ---------- てがみ（mailto） ---------- */
+  document.getElementById('letter').addEventListener('submit', function(e){
+    e.preventDefault();
+    sndSelect(); vibrate();
+    var name = document.getElementById('f-name').value.trim();
+    var mail = document.getElementById('f-mail').value.trim();
+    var body = document.getElementById('f-body').value.trim();
+    var text = 'お名前: ' + (name || '（未記入）') + '\n'
+             + 'メール: ' + (mail || '（未記入）') + '\n\n'
+             + 'ご相談内容:\n' + (body || '（未記入）') + '\n\n'
+             + '— RYU QUEST（プロフィールサイト）から送信';
+    var subject = '【サイトから】お問い合わせ' + (name ? '（' + name + '様）' : '');
+    go('thanks');
+    setTimeout(function(){
+      try {
+        var a = document.createElement('a');
+        a.href = 'mailto:osako@kaminendo.art?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch(err){}
+    }, 400);
+  });
+
+  /* ---------- タップ・キー操作 ---------- */
+  document.getElementById('stage').addEventListener('click', function(e){
+    if (e.target.closest('a, button, input, textarea, label, #choicebox, #title')) return;
+    advance();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.target.closest('input, textarea')) return;
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); advance(); }
+  });
+
+  /* ---------- タイトル画面 ---------- */
+  var title = document.getElementById('title');
+  title.addEventListener('click', function(){
+    ac();               /* ユーザー操作で音を解禁 */
+    sndSelect();
+    playWipe(function(){
+      title.classList.add('hide');
+      SCENES.opening.enter();
+    });
+  });
+})();
+</script>
+</body>
+</html>
