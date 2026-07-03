@@ -172,6 +172,14 @@ body{
 .g-send:active{background:#1a2340}
 .g-note{font-size:10.5px;color:#8b93a8;margin-top:8px;line-height:1.8}
 
+/* アルバム */
+#p-album{overflow:hidden}
+#p-album .win{flex:1;display:flex;flex-direction:column;min-height:0}
+#al-frame{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:8px 0 6px}
+#al-img{max-width:96%;max-height:100%;border:3px solid #fff;border-radius:6px;box-shadow:0 0 0 3px #000;object-fit:contain}
+#al-img.pop{animation:winPop .25s steps(3)}
+#al-count{text-align:center;font-size:11px;color:#9fe8ff;letter-spacing:.25em}
+
 /* うらないカード */
 #card-area{display:flex;justify-content:center;padding:8px 0}
 #card{
@@ -345,6 +353,15 @@ body{
     </form>
   </div>
 
+  <!-- アルバム -->
+  <div class="panel" id="p-album">
+    <div class="win">
+      <span class="cap">アルバム</span>
+      <div id="al-frame"><img id="al-img" src="" alt="おもいでの写真"></div>
+      <div id="al-count"></div>
+    </div>
+  </div>
+
   <!-- うらない（カード占い） -->
   <div class="panel" id="p-uranai">
     <div class="win">
@@ -419,6 +436,8 @@ body{
     x: 'https://x.com/ryu0035',
     web: 'https://kaminendo.art/'
   };
+  /* GASのWebアプリURL。直接送信に失敗した場合は自動でメールアプリ起動にフォールバックする */
+  var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyXL_oB0pPXNgGJ6Mm1QvQTM9Jz1GOqvcuHahaWvTfketFx7Ucx5j5jgSPtpkMR_fWuNQ/exec';
 
   /* ---------- 効果音（ファミコン風・ちいさめ） ---------- */
   var AC = null, muted = false;
@@ -643,6 +662,7 @@ body{
     { t: 'しごと <small>魔法の公式LINE</small>', f: function(){ go('shigoto'); } },
     { t: 'どうぐ <small>なんでも屋</small>', f: function(){ go('dougu'); } },
     { t: 'うらなう <small>きょうの カード</small>', f: function(){ go('uranai'); } },
+    { t: 'アルバム <small>おもいでの しゃしん</small>', f: function(){ go('album'); } },
     { t: 'はなす <small>お問い合わせ</small>', f: function(){ go('hanasu'); } },
     { t: 'リンク <small>SNSなど</small>', f: function(){ go('links'); } },
     { t: 'ひみつ <small>みては いけない</small>', f: function(){ go('himitsu'); } }
@@ -688,7 +708,7 @@ body{
     },
     shigoto: {
       enter: function(){
-        setBg(null);
+        setBg('assets/ryu_boss.jpg');
         setPanel('p-shigoto');
         say(['＊かみねんどの メインクエストは\n「魔法の公式LINE」だ。',
              '＊きみの公式LINEも 売れる武器に\nかえられるぞ。'], function(){
@@ -703,7 +723,7 @@ body{
     },
     dougu: {
       enter: function(){
-        setBg(null);
+        setBg('assets/ryu_fun.jpg');
         setPanel('p-dougu');
         say(['＊なんでも屋の どうぐぶくろを ひらいた！\nきになる どうぐを えらんでくれ。'], function(){
           showChoices(douguChoices());
@@ -725,9 +745,18 @@ body{
         });
       }
     },
-    uranai: {
+    album: {
       enter: function(){
         setBg(null);
+        setPanel('p-album');
+        say(['＊おもいでの アルバムを ひらいた。'], function(){
+          showAlbumPhoto(0);
+        });
+      }
+    },
+    uranai: {
+      enter: function(){
+        setBg('assets/ryu_cards.jpg');
         setPanel('p-uranai');
         resetCard();
         say(['＊マジシャンの カードうらない だ。\nこころを きめて カードを ひいてくれ。'], function(){
@@ -740,7 +769,7 @@ body{
     },
     himitsu: {
       enter: function(){
-        setBg(null);
+        setBg('assets/ryu_dark.jpg');
         setPanel('p-himitsu');
         say(['＊…みたな？',
              '＊まあいい。ここまで きたきみには\n「ひみつのしょ」を みせてやろう。'], function(){
@@ -753,7 +782,7 @@ body{
     },
     hanasu: {
       enter: function(){
-        setBg(null);
+        setBg('assets/ryu_hourglass.jpg');
         setPanel(null);
         battleFx();
         say(['＊RYUが あらわれた！',
@@ -869,6 +898,36 @@ body{
     }, 320);
   }
 
+  /* ---------- アルバム ---------- */
+  var ALBUM = [
+    ['assets/ryu_spread.jpg',   'ぶたいの うえが いちばん すきだ。'],
+    ['assets/ryu_table.jpg',    'テーブルマジックは きょりが ちかいほど もりあがる。'],
+    ['assets/ryu_juggle.jpg',   'なにが とびだすかは ひみつだ。'],
+    ['assets/ryu_bubble.jpg',   'マジックは すこし ふしぎな にちじょう。'],
+    ['assets/ryu_night.jpg',    'よるには よるの まほうが ある。'],
+    ['assets/ryu_award.jpg',    'じゅしょうの おもいで。'],
+    ['assets/ryu_fun.jpg',      'あそびごころも しごとの うちだ。']
+  ];
+  var alImg = document.getElementById('al-img');
+  var alCount = document.getElementById('al-count');
+  var alIdx = 0;
+  function albumChoices(){
+    return [
+      { t: 'つぎの しゃしん', f: function(){ showAlbumPhoto(alIdx + 1); } },
+      { t: 'まえの しゃしん', f: function(){ showAlbumPhoto(alIdx - 1); } },
+      backChoice()
+    ];
+  }
+  function showAlbumPhoto(i){
+    alIdx = (i + ALBUM.length) % ALBUM.length;
+    alImg.classList.remove('pop'); void alImg.offsetWidth;
+    alImg.src = ALBUM[alIdx][0];
+    alImg.classList.add('pop');
+    alCount.textContent = (alIdx + 1) + ' / ' + ALBUM.length;
+    var next = new Image(); next.src = ALBUM[(alIdx + 1) % ALBUM.length][0]; /* 先読み */
+    say(['＊' + ALBUM[alIdx][1]], function(){ showChoices(albumChoices()); });
+  }
+
   /* ---------- LVカウントアップ演出 ---------- */
   var lvTimer = null;
   function startLvCount(){
@@ -978,8 +1037,7 @@ body{
              + 'ご相談内容:\n' + (body || '（未記入）') + '\n\n'
              + '— RYU QUEST（プロフィールサイト）から送信';
     var subject = '【サイトから】お問い合わせ' + (name ? '（' + name + '様）' : '');
-    go('thanks');
-    setTimeout(function(){
+    var fallbackMail = function(){
       try {
         var a = document.createElement('a');
         a.href = 'mailto:osako@kaminendo.art?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
@@ -988,7 +1046,29 @@ body{
         a.click();
         document.body.removeChild(a);
       } catch(err){}
-    }, 400);
+    };
+    if (FORM_ENDPOINT && window.fetch){
+      /* GAS Webアプリへ直接送信（text/plainでCORSプリフライト回避）。失敗時はメールアプリへ */
+      say(['＊てがみを おくっている…'], null);
+      var done = false;
+      var finish = function(useMailApp){
+        if (done) return;
+        done = true;
+        if (useMailApp) fallbackMail();
+        go('thanks');
+      };
+      var timer = setTimeout(function(){ finish(true); }, 9000);
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ name: name, email: mail, body: body, page: location.href })
+      }).then(function(r){ return r.json(); })
+        .then(function(j){ clearTimeout(timer); finish(!(j && j.ok)); })
+        .catch(function(){ clearTimeout(timer); finish(true); });
+      return;
+    }
+    go('thanks');
+    setTimeout(fallbackMail, 400);
   });
 
   /* ---------- タップ・キー操作 ---------- */

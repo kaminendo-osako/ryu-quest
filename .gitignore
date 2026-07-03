@@ -4,6 +4,12 @@ doc/
 # 旧バージョンのバックアップ
 index_v1_card.html
 
+# GAS（お問い合わせ受信）のソースはリポジトリに含めない
+gas-contact/
+
+# 写真の元データ
+picture/
+
 # OSゴミファイル
 Thumbs.db
 desktop.ini
