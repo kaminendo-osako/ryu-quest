@@ -238,6 +238,50 @@ body{
 .choice:hover{color:#ffd76a}
 .choice small{color:#8b93a8;font-size:11px;margin-left:6px}
 
+/* ======== 管理画面（へんしゅうのしょ）・ログイン ======== */
+.ovl{position:absolute;inset:0;z-index:92;background:rgba(0,0,10,.85);display:flex;align-items:center;justify-content:center;padding:20px}
+.ovl[hidden]{display:none}
+.ovl-box{width:100%;max-width:320px}
+.ovl-note{font-size:12px;color:#9fe8ff;margin-bottom:2px;line-height:1.8}
+.a-label{display:block;font-size:11.5px;color:#9fe8ff;margin:10px 0 4px}
+.a-input{
+  width:100%;background:#000;border:2px solid #fff;border-radius:4px;
+  color:#fff;font-family:inherit;font-size:16px;padding:8px 9px;
+  outline:none;caret-color:#8ef0b4;
+}
+.a-input:focus{border-color:#8ef0b4}
+textarea.a-input{resize:vertical;line-height:1.8}
+.a-row{display:flex;gap:8px;margin-top:14px}
+.a-btn{
+  flex:1;background:#000;border:2px solid #fff;border-radius:6px;color:#fff;
+  font-family:inherit;font-size:13.5px;padding:10px 8px;cursor:pointer;
+}
+.a-btn.primary{border-color:#8ef0b4;color:#8ef0b4}
+.a-btn:disabled{opacity:.5;cursor:default}
+.a-err{font-size:11.5px;color:#ff9db0;margin-top:8px;min-height:1em;line-height:1.7}
+.a-ok{color:#8ef0b4}
+.shake-x{animation:shakey .4s linear}
+#admin{position:absolute;inset:0;z-index:92;background:#05070f;display:flex;flex-direction:column}
+#admin[hidden]{display:none}
+.a-head{display:flex;justify-content:space-between;align-items:center;padding:10px 10px 4px}
+.a-body{
+  flex:1;overflow-y:auto;padding:14px 12px 20px;
+  display:flex;flex-direction:column;gap:20px;scrollbar-width:none;
+}
+.a-body::-webkit-scrollbar{display:none}
+.a-sec{font-size:13px}
+.a-help{font-size:11px;color:#8b93a8;line-height:1.8;margin-top:8px}
+.a-foot{display:flex;gap:10px;padding:10px 12px 14px;border-top:2px solid #222a3e}
+.a-alrow{display:flex;gap:10px;align-items:flex-start;margin-top:10px}
+.a-alrow img{width:44px;height:58px;object-fit:cover;border:2px solid #fff;border-radius:4px;flex:0 0 auto}
+.a-alrow textarea{flex:1}
+.a-toast{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:80px;z-index:95;
+  font-size:12.5px;padding:10px 14px;max-width:86%;text-align:center;
+}
+.a-toast[hidden]{display:none}
+#brand{cursor:pointer}
+
 /* ======== メッセージウィンドウ ======== */
 #msgbox{
   position:absolute;left:8px;right:8px;bottom:10px;z-index:50;
@@ -266,7 +310,7 @@ body{
 
   <!-- 上部バー -->
   <div id="topbar">
-    <span class="chip">RYU QUEST</span>
+    <button class="chip" id="brand" type="button">RYU QUEST</button>
     <button class="chip" id="snd" type="button">おと:ON</button>
   </div>
 
@@ -291,7 +335,7 @@ body{
     </div>
     <div class="win">
       <span class="cap">クエストクリアきろく</span>
-      <ul class="quest">
+      <ul class="quest" id="quest-list">
         <li>活動2年目 マジック大会 入賞</li>
         <li>銀座 Bar &amp; Magic ACE 出演中</li>
         <li>六本木 Magic bar M.o.L 出演中</li>
@@ -382,7 +426,7 @@ body{
   <div class="panel" id="p-himitsu">
     <div class="win">
       <span class="cap">ひみつのしょ</span>
-      <ul class="quest">
+      <ul class="quest" id="himitsu-list">
         <li>基本 いんどあ の ひきこもり</li>
         <li>お酒と カラオケが 大すき（軽音サークル出身）</li>
         <li>ストーリーの こった ゲームに よわい</li>
@@ -427,6 +471,99 @@ body{
     <div id="t-copy">© 2026 KAMINENDO Inc.　kaminendo.art</div>
   </div>
 
+  <!-- ログイン（かんりしつ） -->
+  <div class="ovl" id="login" hidden>
+    <form class="win ovl-box" id="login-form">
+      <span class="cap">かんりしつ</span>
+      <p class="ovl-note">あいことばを となえてください。</p>
+      <label class="a-label" for="li-id">ログインID（メールアドレス）</label>
+      <input class="a-input" id="li-id" type="email" autocomplete="username">
+      <label class="a-label" for="li-pass">パスワード</label>
+      <input class="a-input" id="li-pass" type="password" autocomplete="current-password">
+      <p class="a-err" id="li-err"></p>
+      <div class="a-row">
+        <button class="a-btn" type="button" id="li-cancel">やめる</button>
+        <button class="a-btn primary" type="submit" id="li-go">▶ ログイン</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 管理画面（へんしゅうのしょ） -->
+  <div id="admin" hidden>
+    <div class="a-head">
+      <span class="chip">へんしゅうのしょ</span>
+      <button class="chip" type="button" id="a-close">とじる ✕</button>
+    </div>
+    <div class="a-body">
+      <div class="win a-sec">
+        <span class="cap">つかいかた</span>
+        <p class="a-help" style="margin-top:0">
+          ことばを かきかえて、いちばん下の「▶ セーブする」を おしてください。<br>
+          ほぞんすると すぐ ほんばんサイトに はんえいされます（サイトを ひらきなおすと 見えます）。<br>
+          まちがえても だいじょうぶ。セーブしなければ なにも かわりません。
+        </p>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">リンク</span>
+        <label class="a-label">公式LINE のURL</label>
+        <input class="a-input" data-cf="links.line">
+        <label class="a-label">Instagram のURL</label>
+        <input class="a-input" data-cf="links.insta">
+        <label class="a-label">X（Twitter）のURL</label>
+        <input class="a-input" data-cf="links.x">
+        <label class="a-label">Webサイト のURL</label>
+        <input class="a-input" data-cf="links.web">
+      </div>
+      <div class="win a-sec">
+        <span class="cap">オープニングの じこしょうかい</span>
+        <textarea class="a-input" rows="3" data-cf="openingIntro"></textarea>
+        <p class="a-help">さいしょの あいさつで しゃべる ことば。「＊」で はじめると ゲームらしくなります。</p>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">つよさ：クエストきろく</span>
+        <textarea class="a-input" rows="7" data-cf="quest" data-lines="1"></textarea>
+        <p class="a-help">1ぎょうに 1こ。じっせき・けいれきを ならべてください。</p>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">どうぐ（なんでも屋）</span>
+        <div id="a-items"></div>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">アルバムの ことば</span>
+        <div id="a-album"></div>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">うらないの けっか</span>
+        <textarea class="a-input" rows="9" data-cf="fortunes" data-lines="1"></textarea>
+        <p class="a-help">1ぎょうに 1こ。ランダムで 1つ でます。</p>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">キャラの ひとりごと</span>
+        <textarea class="a-input" rows="9" data-cf="talk" data-lines="1"></textarea>
+        <p class="a-help">あるいている キャラを さわったときの セリフ。1ぎょうに 1こ。「\n」と かくと そこで かいぎょうします。</p>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">ひみつのしょ</span>
+        <textarea class="a-input" rows="6" data-cf="himitsu" data-lines="1"></textarea>
+        <p class="a-help">1ぎょうに 1こ。</p>
+      </div>
+      <div class="win a-sec">
+        <span class="cap">パスワードの へんこう</span>
+        <label class="a-label">あたらしい パスワード（4もじ いじょう）</label>
+        <input class="a-input" id="a-np1" type="password" autocomplete="new-password">
+        <label class="a-label">もういちど にゅうりょく</label>
+        <input class="a-input" id="a-np2" type="password" autocomplete="new-password">
+        <button class="a-btn" type="button" id="a-passbtn" style="margin-top:12px;width:100%">パスワードを かえる</button>
+        <p class="a-err" id="a-passmsg"></p>
+      </div>
+    </div>
+    <div class="a-foot">
+      <button class="a-btn" type="button" id="a-logout">ログアウト</button>
+      <button class="a-btn primary" type="button" id="a-save">▶ セーブする</button>
+    </div>
+    <div class="a-toast win" id="a-toast" hidden></div>
+  </div>
+
   <div id="confetti"></div>
   <div id="flash"></div>
   <div id="wipe"></div>
@@ -437,13 +574,77 @@ body{
 (function(){
   'use strict';
 
-  /* ---------- リンク ---------- */
-  var LINK = {
-    line: 'https://line.me/R/ti/p/@353wsppj',
-    insta: 'https://www.instagram.com/ryu_entertainment0/',
-    x: 'https://x.com/ryu0035',
-    web: 'https://kaminendo.art/'
+  /* ---------- 編集できるコンテンツ（管理画面「へんしゅうのしょ」で上書き可能） ---------- */
+  var CONTENT = {
+    links: {
+      line: 'https://line.me/R/ti/p/@353wsppj',
+      insta: 'https://www.instagram.com/ryu_entertainment0/',
+      x: 'https://x.com/ryu0035',
+      web: 'https://kaminendo.art/'
+    },
+    openingIntro: '＊僕は 大迫龍太（おおさこ りゅうた）。\nマジシャンで 社長で なんでも屋だ。',
+    quest: [
+      '活動2年目 マジック大会 入賞',
+      '銀座 Bar & Magic ACE 出演中',
+      '六本木 Magic bar M.o.L 出演中',
+      'オーストラリア130公演 クリア',
+      '定期公演『FROM』を 主宰',
+      'ＴＶ『有吉ジャポン』に 出現'
+    ],
+    items: [
+      { n: 'TikTok運用代行',
+        d: '＊完全成果報酬制！ 初期費用0円・固定費0円、1再生1円〜。\n自社アプリで 再生数50万回を たたきだした ノウハウつきだ。' },
+      { n: 'ECの売上向上',
+        d: '＊確実に ECショップの売上を あげる。\n広告費にかける予定の よさん、まず 僕に つかわせてくれ。' },
+      { n: '写真撮影',
+        d: '＊仕事が来る 宣材写真と、撮影工程から おもしろい 売れる商品写真。\nパフォーマーの撮影も とくいだ。' },
+      { n: 'システム開発翻訳',
+        d: '＊「作りたい人」と エンジニアの あいだに立つ 翻訳者になる。\nすれちがいのない 開発が できるぞ。' },
+      { n: '社内DX化',
+        d: '＊業務を 徹底ヒアリングして、導入ハードルの低い DX化。\nIT導入補助金の かつようも おまかせだ。' },
+      { n: '本の自炊代行',
+        d: '＊家の本を 一気にPDF化。1冊200円〜。\n本棚が からっぽになる ふしぎな どうぐだ。' },
+      { n: 'アイデア相談',
+        d: '＊SNSで拡散される 唯一無二の 演出アイデアを さずけよう。\n必ずフォローされる名刺も 作れるぞ。' }
+    ],
+    fortunes: [
+      'きょうは なにを やっても うまくいく きがするぞ。',
+      'あたらしいことを はじめるには いい日だ。',
+      'ちいさな しっぱいは わらいに かえてしまおう。',
+      'こまったら だれかに そうだんしよう。僕でも いいぞ。',
+      'ごはんを しっかり たべると うんきが あがるぞ。',
+      'きょう であった人を たいせつに するといい。',
+      'むりは しなくていい。やすむのも ぼうけんの うちだ。',
+      'おもいきった ちょうせんが きち と でている！'
+    ],
+    talk: [
+      '＊わっ！ びっくりした！',
+      '＊なでても なにも でないぞ。\n……でたら それは マジックだ。',
+      '＊この窓のうえ、けっこう ながめが いいんだ。',
+      '＊しごとの そうだんは「はなす」から どうぞ。',
+      '＊きょうも いい まほうびより だ。',
+      '＊あんまり つつくと くすぐったい！',
+      '＊うんどうぶそく かいしょうちゅう。\nじゃまを しないでくれ。',
+      '＊…じつは これ、僕の ぶんしんだ。\nほんものは いま しごとちゅう。'
+    ],
+    album: [
+      'えいがを みる かんかくで マジックショーを みてほしい。',
+      'テーブルマジックは きょりが ちかいほど もりあがる。',
+      'なにが とびだすかは ひみつだ。',
+      'マジックは すこし ふしぎな にちじょう。',
+      'よるには よるの まほうが ある。',
+      'じんせいは パズルだ。',
+      'あそびごころも しごとの うちだ。'
+    ],
+    himitsu: [
+      '基本 いんどあ の ひきこもり',
+      'お酒と カラオケが 大すき（軽音サークル出身）',
+      'ストーリーの こった ゲームに よわい',
+      '脱出ゲームが すき。いつか どこかに 閉じこめられて 脱出してみたい',
+      'うまれつき 左耳が きこえない。のみかいは 左はしが ていいち'
+    ]
   };
+  var LINK = CONTENT.links;
   /* GASのWebアプリURL。直接送信に失敗した場合は自動でメールアプリ起動にフォールバックする */
   var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyXL_oB0pPXNgGJ6Mm1QvQTM9Jz1GOqvcuHahaWvTfketFx7Ucx5j5jgSPtpkMR_fWuNQ/exec';
 
@@ -595,17 +796,7 @@ body{
   var CH_HOME = 16;
   var ch = { mode: 'hidden', x: CH_HOME, dir: 1, tick: 0, pauseUntil: 0, hopUntil: 0 };
 
-  /* さわると はなしかけてくる */
-  var CH_TALK = [
-    '＊わっ！ びっくりした！',
-    '＊なでても なにも でないぞ。\n……でたら それは マジックだ。',
-    '＊この窓のうえ、けっこう ながめが いいんだ。',
-    '＊しごとの そうだんは「はなす」から どうぞ。',
-    '＊きょうも いい まほうびより だ。',
-    '＊あんまり つつくと くすぐったい！',
-    '＊うんどうぶそく かいしょうちゅう。\nじゃまを しないでくれ。',
-    '＊…じつは これ、僕の ぶんしんだ。\nほんものは いま しごとちゅう。'
-  ];
+  /* さわると はなしかけてくる（セリフは CONTENT.talk） */
   chara.addEventListener('click', function(e){
     e.stopPropagation();
     if (ch.mode !== 'pace') return;          /* はしっている最中は そっとしておく */
@@ -613,7 +804,7 @@ body{
     sndTalk(); vibrate();
     ch.hopUntil = Date.now() + 240;          /* ぴょん */
     ch.pauseUntil = Date.now() + 2800;       /* 立ち止まって はなす */
-    var quip = CH_TALK[Math.floor(Math.random() * CH_TALK.length)];
+    var quip = CONTENT.talk[Math.floor(Math.random() * CONTENT.talk.length)];
     var restore = lastChoices;
     say([quip], function(){ if (restore) showChoices(restore); });
   });
@@ -821,7 +1012,7 @@ body{
         setPanel(null);
         var lines = [hello];
         if (visits >= 2) lines.push('＊おかえりなさい！\nこれで ' + visits + 'かいめの ぼうけんだ。');
-        lines.push('＊僕は 大迫龍太（おおさこ りゅうた）。\nマジシャンで 社長で なんでも屋だ。');
+        lines.push(CONTENT.openingIntro);
         lines.push('＊ようけんを えらんでくれ！');
         say(lines, function(){ showChoices(mainMenu); });
       }
@@ -868,12 +1059,16 @@ body{
       enter: function(){
         setBg(null);
         setPanel(null);
+        var tail = function(url){
+          var m = String(url || '').match(/@[\w.-]+|[^\/]+(?=\/?$)/);
+          return m ? m[0] : '';
+        };
         say(['＊そとの せかいへ つながる とびらだ。'], function(){
           showChoices([
-            { t: 'Instagram <small>ryu_entertainment0</small>', href: LINK.insta },
-            { t: 'X <small>ryu0035</small>', href: LINK.x },
-            { t: 'Webサイト <small>kaminendo.art</small>', href: LINK.web },
-            { t: 'こうしきLINE <small>@353wsppj</small>', href: LINK.line },
+            { t: 'Instagram <small>' + tail(LINK.insta) + '</small>', href: LINK.insta },
+            { t: 'X <small>' + tail(LINK.x) + '</small>', href: LINK.x },
+            { t: 'Webサイト <small>' + tail(LINK.web) + '</small>', href: LINK.web },
+            { t: 'こうしきLINE <small>' + tail(LINK.line) + '</small>', href: LINK.line },
             backChoice()
           ]);
         });
@@ -982,16 +1177,6 @@ body{
   var cardName = document.getElementById('card-name');
   var SUITS = [['♠', false, 'しごと運'], ['♥', true, 'あい運'], ['♦', true, 'かね運'], ['♣', false, 'けんこう運']];
   var RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-  var FORTUNES = [
-    'きょうは なにを やっても うまくいく きがするぞ。',
-    'あたらしいことを はじめるには いい日だ。',
-    'ちいさな しっぱいは わらいに かえてしまおう。',
-    'こまったら だれかに そうだんしよう。僕でも いいぞ。',
-    'ごはんを しっかり たべると うんきが あがるぞ。',
-    'きょう であった人を たいせつに するといい。',
-    'むりは しなくていい。やすむのも ぼうけんの うちだ。',
-    'おもいきった ちょうせんが きち と でている！'
-  ];
   function resetCard(){
     cardEl.className = 'back';
     cardSuit.textContent = '？';
@@ -1022,7 +1207,7 @@ body{
         cardEl.className = su[1] ? 'red spin' : 'spin';
         cardSuit.textContent = su[0] + rk;
         cardName.textContent = su[2];
-        say(['＊' + su[0] + 'の' + rk + '。「' + su[2] + '」の カードだ。\n' + FORTUNES[Math.floor(Math.random() * FORTUNES.length)]], function(){
+        say(['＊' + su[0] + 'の' + rk + '。「' + su[2] + '」の カードだ。\n' + CONTENT.fortunes[Math.floor(Math.random() * CONTENT.fortunes.length)]], function(){
           showChoices([
             { t: 'もういちど ひく', f: drawCard },
             backChoice()
@@ -1032,15 +1217,15 @@ body{
     }, 320);
   }
 
-  /* ---------- アルバム ---------- */
-  var ALBUM = [
-    ['assets/ryu_spread.jpg',   'えいがを みる かんかくで マジックショーを みてほしい。'],
-    ['assets/ryu_table.jpg',    'テーブルマジックは きょりが ちかいほど もりあがる。'],
-    ['assets/ryu_juggle.jpg',   'なにが とびだすかは ひみつだ。'],
-    ['assets/ryu_bubble.jpg',   'マジックは すこし ふしぎな にちじょう。'],
-    ['assets/ryu_night.jpg',    'よるには よるの まほうが ある。'],
-    ['assets/ryu_award.jpg',    'じんせいは パズルだ。'],
-    ['assets/ryu_fun.jpg',      'あそびごころも しごとの うちだ。']
+  /* ---------- アルバム（キャプションは CONTENT.album） ---------- */
+  var AL_SRC = [
+    'assets/ryu_spread.jpg',
+    'assets/ryu_table.jpg',
+    'assets/ryu_juggle.jpg',
+    'assets/ryu_bubble.jpg',
+    'assets/ryu_night.jpg',
+    'assets/ryu_award.jpg',
+    'assets/ryu_fun.jpg'
   ];
   var alImg = document.getElementById('al-img');
   var alCount = document.getElementById('al-count');
@@ -1053,13 +1238,13 @@ body{
     ];
   }
   function showAlbumPhoto(i){
-    alIdx = (i + ALBUM.length) % ALBUM.length;
+    alIdx = (i + AL_SRC.length) % AL_SRC.length;
     alImg.classList.remove('pop'); void alImg.offsetWidth;
-    alImg.src = ALBUM[alIdx][0];
+    alImg.src = AL_SRC[alIdx];
     alImg.classList.add('pop');
-    alCount.textContent = (alIdx + 1) + ' / ' + ALBUM.length;
-    var next = new Image(); next.src = ALBUM[(alIdx + 1) % ALBUM.length][0]; /* 先読み */
-    say(['＊' + ALBUM[alIdx][1]], function(){ showChoices(albumChoices()); });
+    alCount.textContent = (alIdx + 1) + ' / ' + AL_SRC.length;
+    var next = new Image(); next.src = AL_SRC[(alIdx + 1) % AL_SRC.length]; /* 先読み */
+    say(['＊' + (CONTENT.album[alIdx] || '……。')], function(){ showChoices(albumChoices()); });
   }
 
   /* ---------- LVカウントアップ演出 ---------- */
@@ -1122,38 +1307,26 @@ body{
     });
   }
 
-  /* ---------- どうぐ（なんでも屋） ---------- */
-  var ITEMS = [
-    { n: 'TikTok運用代行',
-      d: '＊完全成果報酬制！ 初期費用0円・固定費0円、1再生1円〜。\n自社アプリで 再生数50万回を たたきだした ノウハウつきだ。' },
-    { n: 'ECの売上向上',
-      d: '＊確実に ECショップの売上を あげる。\n広告費にかける予定の よさん、まず 僕に つかわせてくれ。' },
-    { n: '写真撮影',
-      d: '＊仕事が来る 宣材写真と、撮影工程から おもしろい 売れる商品写真。\nパフォーマーの撮影も とくいだ。' },
-    { n: 'システム開発翻訳',
-      d: '＊「作りたい人」と エンジニアの あいだに立つ 翻訳者になる。\nすれちがいのない 開発が できるぞ。' },
-    { n: '社内DX化',
-      d: '＊業務を 徹底ヒアリングして、導入ハードルの低い DX化。\nIT導入補助金の かつようも おまかせだ。' },
-    { n: '本の自炊代行',
-      d: '＊家の本を 一気にPDF化。1冊200円〜。\n本棚が からっぽになる ふしぎな どうぐだ。' },
-    { n: 'アイデア相談',
-      d: '＊SNSで拡散される 唯一無二の 演出アイデアを さずけよう。\n必ずフォローされる名刺も 作れるぞ。' }
-  ];
+  /* ---------- どうぐ（なんでも屋）：CONTENT.items から生成 ---------- */
   var itemList = document.getElementById('item-list');
-  ITEMS.forEach(function(item, idx){
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'item-btn';
-    b.textContent = item.n;
-    b.addEventListener('click', function(ev){
-      ev.stopPropagation();
-      sndSelect(); vibrate();
-      itemList.querySelectorAll('.item-btn').forEach(function(x){ x.classList.remove('sel'); });
-      b.classList.add('sel');
-      say([item.d], function(){ showChoices(douguChoices(item.n)); });
+  function buildItemList(){
+    itemList.innerHTML = '';
+    CONTENT.items.forEach(function(item){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'item-btn';
+      b.textContent = item.n;
+      b.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        sndSelect(); vibrate();
+        itemList.querySelectorAll('.item-btn').forEach(function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+        say([item.d], function(){ showChoices(douguChoices(item.n)); });
+      });
+      itemList.appendChild(b);
     });
-    itemList.appendChild(b);
-  });
+  }
+  buildItemList();
   function douguChoices(itemName){
     var list = [];
     if (itemName){
@@ -1211,12 +1384,287 @@ body{
 
   /* ---------- タップ・キー操作 ---------- */
   document.getElementById('stage').addEventListener('click', function(e){
-    if (e.target.closest('a, button, input, textarea, label, #choicebox, #title')) return;
+    if (e.target.closest('a, button, input, textarea, label, #choicebox, #title, #admin, #login')) return;
     advance();
   });
   document.addEventListener('keydown', function(e){
     if (e.target.closest('input, textarea')) return;
     if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); advance(); }
+  });
+
+  /* ==================================================================
+     コンテンツの反映と管理画面（へんしゅうのしょ）
+     ================================================================== */
+
+  /* ---------- リスト描画（つよさ・ひみつ） ---------- */
+  function renderLists(){
+    var q = document.getElementById('quest-list');
+    q.innerHTML = '';
+    CONTENT.quest.forEach(function(t){
+      var li = document.createElement('li'); li.textContent = t; q.appendChild(li);
+    });
+    var h = document.getElementById('himitsu-list');
+    h.innerHTML = '';
+    CONTENT.himitsu.forEach(function(t){
+      var li = document.createElement('li'); li.textContent = t; h.appendChild(li);
+    });
+  }
+  renderLists();
+
+  /* ---------- サーバー保存分の上書き適用 ---------- */
+  function applyContent(c){
+    if (!c || typeof c !== 'object') return;
+    if (c.links && typeof c.links === 'object'){
+      ['line', 'insta', 'x', 'web'].forEach(function(k){
+        if (typeof c.links[k] === 'string' && c.links[k].trim()) CONTENT.links[k] = c.links[k].trim();
+      });
+    }
+    if (typeof c.openingIntro === 'string' && c.openingIntro.trim()) CONTENT.openingIntro = c.openingIntro;
+    ['quest', 'fortunes', 'talk', 'himitsu'].forEach(function(k){
+      if (Array.isArray(c[k])){
+        var arr = c[k].filter(function(s){ return typeof s === 'string' && s.trim(); });
+        if (arr.length) CONTENT[k] = arr;
+      }
+    });
+    if (Array.isArray(c.album)){
+      CONTENT.album = CONTENT.album.map(function(v, i){
+        return (typeof c.album[i] === 'string' && c.album[i].trim()) ? c.album[i] : v;
+      });
+    }
+    if (Array.isArray(c.items)){
+      CONTENT.items = CONTENT.items.map(function(it, i){
+        var ov = c.items[i];
+        if (!ov || typeof ov !== 'object') return it;
+        return { n: (typeof ov.n === 'string' && ov.n.trim()) ? ov.n : it.n,
+                 d: (typeof ov.d === 'string' && ov.d.trim()) ? ov.d : it.d };
+      });
+    }
+    renderLists();
+    buildItemList();
+  }
+
+  /* 起動時にサーバー保存分を読み込む（失敗しても組み込みの内容で動く） */
+  if (FORM_ENDPOINT && window.fetch){
+    fetch(FORM_ENDPOINT + '?content=1')
+      .then(function(r){ return r.json(); })
+      .then(applyContent)
+      .catch(function(){});
+  }
+
+  /* ---------- 管理画面：共通 ---------- */
+  var adminAuth = { id: '', pass: '' };
+  try {
+    var savedAuth = sessionStorage.getItem('rq_admin');
+    if (savedAuth) adminAuth = JSON.parse(savedAuth);
+  } catch(e){}
+
+  function apiPost(payload){
+    return fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    }).then(function(r){ return r.json(); });
+  }
+
+  var loginEl = document.getElementById('login');
+  var adminEl = document.getElementById('admin');
+  var toastEl = document.getElementById('a-toast');
+  var toastTimer = null;
+  function toast(msg, ok){
+    toastEl.textContent = msg;
+    toastEl.style.color = ok ? '#8ef0b4' : '#ff9db0';
+    toastEl.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.hidden = true; }, 3200);
+  }
+
+  /* ---------- 編集フィールド（data-cf）ヘルパー ---------- */
+  function cfRef(path){
+    var parts = path.split('.');
+    var obj = CONTENT;
+    for (var i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+    return { obj: obj, key: parts[parts.length - 1] };
+  }
+  function linesToText(arr){
+    return (arr || []).map(function(s){ return String(s).replace(/\n/g, '\\n'); }).join('\n');
+  }
+  function textToLines(text){
+    return String(text).split('\n')
+      .map(function(s){ return s.replace(/\\n/g, '\n'); })
+      .filter(function(s){ return s.trim(); });
+  }
+  function populateAdmin(){
+    adminEl.querySelectorAll('[data-cf]').forEach(function(el){
+      var r = cfRef(el.dataset.cf);
+      var v = r.obj[r.key];
+      el.value = el.dataset.lines ? linesToText(v) : (v == null ? '' : v);
+    });
+  }
+  function collectAdmin(){
+    adminEl.querySelectorAll('[data-cf]').forEach(function(el){
+      var r = cfRef(el.dataset.cf);
+      if (el.dataset.lines){
+        var arr = textToLines(el.value);
+        if (arr.length) r.obj[r.key] = arr;
+      } else {
+        var v = el.value.trim();
+        if (v) r.obj[r.key] = v;
+      }
+    });
+  }
+
+  /* ---------- 編集フォームの生成（どうぐ・アルバム） ---------- */
+  var adminBuilt = false;
+  function buildAdminEditors(){
+    if (adminBuilt) return;
+    adminBuilt = true;
+    var itemsBox = document.getElementById('a-items');
+    CONTENT.items.forEach(function(_, i){
+      var lb1 = document.createElement('label');
+      lb1.className = 'a-label'; lb1.textContent = 'どうぐ' + (i + 1) + '：なまえ';
+      var inp = document.createElement('input');
+      inp.className = 'a-input'; inp.setAttribute('data-cf', 'items.' + i + '.n');
+      var lb2 = document.createElement('label');
+      lb2.className = 'a-label'; lb2.textContent = 'どうぐ' + (i + 1) + '：せつめい（「\\n」で かいぎょう）';
+      var ta = document.createElement('textarea');
+      ta.className = 'a-input'; ta.rows = 3; ta.setAttribute('data-cf', 'items.' + i + '.d');
+      itemsBox.appendChild(lb1); itemsBox.appendChild(inp);
+      itemsBox.appendChild(lb2); itemsBox.appendChild(ta);
+    });
+    var albumBox = document.getElementById('a-album');
+    AL_SRC.forEach(function(src, i){
+      var row = document.createElement('div');
+      row.className = 'a-alrow';
+      var img = document.createElement('img');
+      img.src = src; img.alt = 'しゃしん' + (i + 1);
+      var ta = document.createElement('textarea');
+      ta.className = 'a-input'; ta.rows = 2; ta.setAttribute('data-cf', 'album.' + i);
+      row.appendChild(img); row.appendChild(ta);
+      albumBox.appendChild(row);
+    });
+    /* 変更検知（とじる時の注意用） */
+    adminEl.addEventListener('input', function(){ adminDirty = true; });
+  }
+  var adminDirty = false;
+
+  /* ---------- ログイン ---------- */
+  var liErr = document.getElementById('li-err');
+  function openLogin(){
+    liErr.textContent = '';
+    document.getElementById('li-id').value = adminAuth.id || '';
+    document.getElementById('li-pass').value = '';
+    loginEl.hidden = false;
+    document.getElementById(adminAuth.id ? 'li-pass' : 'li-id').focus();
+  }
+  function openAdmin(){
+    buildAdminEditors();
+    populateAdmin();
+    adminDirty = false;
+    document.getElementById('a-np1').value = '';
+    document.getElementById('a-np2').value = '';
+    document.getElementById('a-passmsg').textContent = '';
+    adminEl.hidden = false;
+  }
+  document.getElementById('brand').addEventListener('click', function(e){
+    e.stopPropagation();
+    sndSelect();
+    if (adminAuth.id && adminAuth.pass) openAdmin();
+    else openLogin();
+  });
+  document.getElementById('li-cancel').addEventListener('click', function(){
+    loginEl.hidden = true;
+  });
+  document.getElementById('login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var id = document.getElementById('li-id').value.trim();
+    var pass = document.getElementById('li-pass').value;
+    var btn = document.getElementById('li-go');
+    if (!id || !pass){ liErr.textContent = '＊IDと パスワードを いれてくれ。'; return; }
+    btn.disabled = true; btn.textContent = 'かくにんちゅう…';
+    liErr.textContent = '';
+    apiPost({ action: 'login', id: id, pass: pass })
+      .then(function(j){
+        btn.disabled = false; btn.textContent = '▶ ログイン';
+        if (j && j.ok){
+          adminAuth = { id: id, pass: pass };
+          try { sessionStorage.setItem('rq_admin', JSON.stringify(adminAuth)); } catch(err){}
+          sndJingle();
+          loginEl.hidden = true;
+          openAdmin();
+        } else {
+          sndEncounter();
+          liErr.textContent = '＊IDか パスワードが ちがうようだ。';
+          var box = document.querySelector('#login .ovl-box');
+          box.classList.remove('shake-x'); void box.offsetWidth; box.classList.add('shake-x');
+        }
+      })
+      .catch(function(){
+        btn.disabled = false; btn.textContent = '▶ ログイン';
+        liErr.textContent = '＊サーバーに つながらなかった。\nでんぱの よいところで もういちど ためしてくれ。';
+      });
+  });
+
+  /* ---------- 管理画面：とじる・ログアウト・セーブ・パスワード変更 ---------- */
+  document.getElementById('a-close').addEventListener('click', function(){
+    if (adminDirty && !confirm('セーブしていない へんこうが きえますが、とじますか？')) return;
+    adminEl.hidden = true;
+  });
+  document.getElementById('a-logout').addEventListener('click', function(){
+    adminAuth = { id: '', pass: '' };
+    try { sessionStorage.removeItem('rq_admin'); } catch(err){}
+    adminEl.hidden = true;
+  });
+  document.getElementById('a-save').addEventListener('click', function(){
+    var btn = this;
+    collectAdmin();
+    btn.disabled = true; btn.textContent = 'セーブちゅう…';
+    apiPost({ action: 'save', id: adminAuth.id, pass: adminAuth.pass, content: CONTENT })
+      .then(function(j){
+        btn.disabled = false; btn.textContent = '▶ セーブする';
+        if (j && j.ok){
+          adminDirty = false;
+          applyContent(CONTENT);
+          sndJingle();
+          toast('セーブしました！ ぼうけんのしょに きろくした。', true);
+        } else if (j && j.error === 'auth'){
+          toast('ログインの きげんが きれたようだ。ログアウトして いれなおしてくれ。', false);
+        } else {
+          toast('セーブに しっぱいした…。もういちど ためしてくれ。', false);
+        }
+      })
+      .catch(function(){
+        btn.disabled = false; btn.textContent = '▶ セーブする';
+        toast('サーバーに つながらなかった。でんぱを たしかめてくれ。', false);
+      });
+  });
+  document.getElementById('a-passbtn').addEventListener('click', function(){
+    var btn = this;
+    var msg = document.getElementById('a-passmsg');
+    var p1 = document.getElementById('a-np1').value;
+    var p2 = document.getElementById('a-np2').value;
+    msg.classList.remove('a-ok');
+    if (p1.length < 4){ msg.textContent = '＊4もじ いじょうで おねがい。'; return; }
+    if (p1 !== p2){ msg.textContent = '＊2つの にゅうりょくが あっていない。'; return; }
+    btn.disabled = true;
+    apiPost({ action: 'changepass', id: adminAuth.id, pass: adminAuth.pass, newpass: p1 })
+      .then(function(j){
+        btn.disabled = false;
+        if (j && j.ok){
+          adminAuth.pass = p1;
+          try { sessionStorage.setItem('rq_admin', JSON.stringify(adminAuth)); } catch(err){}
+          document.getElementById('a-np1').value = '';
+          document.getElementById('a-np2').value = '';
+          msg.classList.add('a-ok');
+          msg.textContent = '＊パスワードを かえた！ わすれないように。';
+          sndJingle();
+        } else {
+          msg.textContent = '＊へんこうに しっぱいした…。';
+        }
+      })
+      .catch(function(){
+        btn.disabled = false;
+        msg.textContent = '＊サーバーに つながらなかった。';
+      });
   });
 
   /* ---------- タイトル画面 ---------- */
